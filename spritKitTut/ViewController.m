@@ -11,8 +11,9 @@
 
 @implementation ViewController
 
-- (void)viewDidLoad
+-(void) viewDidLoad
 {
+    
     [super viewDidLoad];
 
     // Configure the view.
@@ -23,29 +24,26 @@
     // Create and configure the scene.
     SKScene * scene = [MyScene sceneWithSize:skView.bounds.size];
     scene.scaleMode = SKSceneScaleModeAspectFill;
+
+    SKView *spriteView = (SKView *) self.view;
+    spriteView.showsNodeCount = NO;
+    spriteView.showsFPS = NO;
     
     // Present the scene.
     [skView presentScene:scene];
+    
 }
 
-- (BOOL)shouldAutorotate
+-(BOOL) shouldAutorotate
 {
     return YES;
 }
 
-- (NSUInteger)supportedInterfaceOrientations
+-(BOOL) prefersStatusBarHidden
 {
-    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
-        return UIInterfaceOrientationMaskAllButUpsideDown;
-    } else {
-        return UIInterfaceOrientationMaskAll;
-    }
-}
+    
+    return YES;
 
-- (void)didReceiveMemoryWarning
-{
-    [super didReceiveMemoryWarning];
-    // Release any cached data, images, etc that aren't in use.
 }
 
 @end

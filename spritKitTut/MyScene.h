@@ -8,6 +8,17 @@
 
 #import <SpriteKit/SpriteKit.h>
 
-@interface MyScene : SKScene
+@interface MyScene : SKScene <SKPhysicsContactDelegate> {
+
+    UISwipeGestureRecognizer* swipeUp;
+    UISwipeGestureRecognizer* swipeDown;
+    SKShapeNode *player;
+    SKLabelNode *scoreLabel;
+    
+    int moveToX;
+    int delay;
+    int score;
+    
+}
 
 @end
