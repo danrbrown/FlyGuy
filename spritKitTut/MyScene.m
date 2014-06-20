@@ -20,10 +20,8 @@
         self.backgroundColor = [SKColor whiteColor];
         self.physicsBody = [SKPhysicsBody bodyWithEdgeLoopFromRect:CGRectMake(0, 0, self.size.width, self.size.height)];
         self.physicsWorld.contactDelegate = self;
-        [self performSelector:@selector(addTopEnemy) withObject:self afterDelay:3.0];
-        [self performSelector:@selector(addMidEnemy) withObject:self afterDelay:6.0];
-        [self performSelector:@selector(addBottomEnemy) withObject:self afterDelay:9.0];
         [self addLevels];
+        [self addCoinsIn];
         
         /* Make Rectangle */
         player = [SKShapeNode node];
@@ -35,8 +33,7 @@
         [self addChild:player];
         
         /* Set Varables */
-        moveToX = -15;
-        delay = (arc4random()%(5-2))+2;
+        moveToX = 5;
         
         /* Make Score Label */
         score = 0;
@@ -46,7 +43,7 @@
         scoreLabel.fontColor = [SKColor blackColor];
         scoreLabel.position = CGPointMake(305, 143);
         [self addChild:scoreLabel];
-        
+
     }
     
     return self;
@@ -68,78 +65,32 @@
     
 }
 
-#pragma mark Make Enemy
-
--(void) addTopEnemy
+-(void) addCoinsIn
 {
     
-    SKShapeNode *topEnemy = [SKShapeNode node];
-    topEnemy.path = [UIBezierPath bezierPathWithOvalInRect:CGRectMake(-10, -10, 25, 25)].CGPath;
-    topEnemy.fillColor = [UIColor blackColor];
-    topEnemy.strokeColor = [UIColor blackColor];
-    topEnemy.glowWidth = 0.5;
-    topEnemy.position = CGPointMake(340, 320);
-    [self addChild:topEnemy];
-    
-    /* Run It Through */
-    SKAction *moveObstacle = [SKAction moveToX:moveToX duration:2.0];
-    [topEnemy runAction:moveObstacle];
-    
-    [topEnemy runAction:moveObstacle completion:^(void){
-        [self blockEnded:topEnemy];
-        delay = (arc4random()%(5-2))+2;
-        [self performSelector:@selector(addTopEnemy) withObject:self afterDelay:delay];
-    }];
+    coin = [SKSpriteNode new];
+    coin = [SKSpriteNode spriteNodeWithImageNamed:@"theCoin"];
+    coin.size = CGSizeMake(16, 22);
+    [self placeCoinAtPointX:340 andY:320];
     
 }
 
--(void) addMidEnemy
+-(void) placeCoinAtPointX:(int)x andY:(int)y
 {
     
-    SKShapeNode *midEnemy = [SKShapeNode node];
-    midEnemy.path = [UIBezierPath bezierPathWithOvalInRect:CGRectMake(-10, -10, 25, 25)].CGPath;
-    midEnemy.fillColor = [UIColor blackColor];
-    midEnemy.strokeColor = [UIColor blackColor];
-    midEnemy.glowWidth = 0.5;
-    midEnemy.position = CGPointMake(340, 260);
-    [self addChild:midEnemy];
+    coin.position = CGPointMake(x, y);
+    [self addChild:coin];
     
-    SKAction *moveObstacle = [SKAction moveToX:moveToX duration:2.0];
+    SKAction *moveObstacle = [SKAction moveToX:moveToX duration:3.0];
+    [coin runAction:moveObstacle];
     
-    [midEnemy runAction:moveObstacle];
-    
-    [midEnemy runAction:moveObstacle completion:^(void){
-        [self blockEnded:midEnemy];
-        delay = (arc4random()%(5-2))+2;
-        [self performSelector:@selector(addMidEnemy) withObject:self afterDelay:delay];
+    [coin runAction:moveObstacle completion:^(void){
+     
+        [coin removeFromParent];
+        
     }];
     
 }
-
--(void) addBottomEnemy
-{
-    
-    SKShapeNode *bottomEnemy = [SKShapeNode node];
-    bottomEnemy.path = [UIBezierPath bezierPathWithOvalInRect:CGRectMake(-10, -10, 25, 25)].CGPath;
-    bottomEnemy.fillColor = [UIColor blackColor];
-    bottomEnemy.strokeColor = [UIColor blackColor];
-    bottomEnemy.glowWidth = 0.5;
-    bottomEnemy.position = CGPointMake(340, 200);
-    [self addChild:bottomEnemy];
-    
-    SKAction *moveObstacle = [SKAction moveToX:moveToX duration:2.0];
-    
-    [bottomEnemy runAction:moveObstacle];
-    
-    [bottomEnemy runAction:moveObstacle completion:^(void){
-        [self blockEnded:bottomEnemy];
-        delay = (arc4random()%(5-2))+2;
-        [self performSelector:@selector(addBottomEnemy) withObject:self afterDelay:delay];
-    }];
-    
-}
-
-#pragma mark Make Levels
 
 -(void) addLevels
 {
@@ -213,17 +164,6 @@
         [player runAction:moveObstacle];
         
     }
-    
-}
-
-#pragma mark Count Score
-
--(void) blockEnded:(SKShapeNode *)enemy
-{
-    
-    [enemy removeFromParent];
-    score++;
-    scoreLabel.text = [NSString stringWithFormat:@"%i", score];
     
 }
 

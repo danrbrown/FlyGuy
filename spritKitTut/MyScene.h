@@ -14,6 +14,7 @@
     UISwipeGestureRecognizer* swipeDown;
     SKShapeNode *player;
     SKLabelNode *scoreLabel;
+    SKSpriteNode *coin;
     
     int moveToX;
     int delay;
