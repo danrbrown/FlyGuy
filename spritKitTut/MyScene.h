@@ -12,13 +12,30 @@
 
     UISwipeGestureRecognizer* swipeUp;
     UISwipeGestureRecognizer* swipeDown;
-    SKShapeNode *player;
+    
+    SKSpriteNode *player;
+    SKSpriteNode *TopCoin;
+    SKSpriteNode *MidCoin;
+    SKSpriteNode *BotCoin;
+    
     SKLabelNode *scoreLabel;
-    SKSpriteNode *coin;
+    SKLabelNode *GameOverLabel;
+    SKLabelNode *YourScoreWasLabel;
+    SKLabelNode *YourHighScoreWasLabel;
+    SKLabelNode *tapToPlayLabel;
+    SKLabelNode *tapToPlayFirstLabel;
     
     int moveToX;
-    int delay;
     int score;
+    int lives;
+
+    int CURRENT_COIN;
+    BOOL ROW_ZERO, ROW_ONE, ROW_TWO;
+    BOOL gameOver;
+    
+    NSTimeInterval _lastUpdateTime;
+    NSTimeInterval _dt;
+    CGPoint _velocity;
     
 }
 

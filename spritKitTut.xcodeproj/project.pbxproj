@@ -26,6 +26,10 @@
 		9C4762DB195375F3001AD6E2 /* PlayerSKS.sks in Resources */ = {isa = PBXBuildFile; fileRef = 9C4762D9195375F3001AD6E2 /* PlayerSKS.sks */; };
 		9C4762DC195375F3001AD6E2 /* spark.png in Resources */ = {isa = PBXBuildFile; fileRef = 9C4762DA195375F3001AD6E2 /* spark.png */; };
 		9CD0FC211954CBA9007C3B00 /* theCoins.png in Resources */ = {isa = PBXBuildFile; fileRef = 9CD0FC201954CBA9007C3B00 /* theCoins.png */; };
+		A5D0608F195A365D007A1950 /* clouds.png in Resources */ = {isa = PBXBuildFile; fileRef = A5D0608E195A365D007A1950 /* clouds.png */; };
+		A5FE630D195B7037000CC93A /* jetPackGuy.png in Resources */ = {isa = PBXBuildFile; fileRef = A5FE630B195B7037000CC93A /* jetPackGuy.png */; };
+		A5FE630E195B7037000CC93A /* jetPackGuyFly.png in Resources */ = {isa = PBXBuildFile; fileRef = A5FE630C195B7037000CC93A /* jetPackGuyFly.png */; };
+		A5FE6310195B74F9000CC93A /* FuelSprite.png in Resources */ = {isa = PBXBuildFile; fileRef = A5FE630F195B74F9000CC93A /* FuelSprite.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -64,6 +68,10 @@
 		9C4762D9195375F3001AD6E2 /* PlayerSKS.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = PlayerSKS.sks; sourceTree = "<group>"; };
 		9C4762DA195375F3001AD6E2 /* spark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = spark.png; sourceTree = "<group>"; };
 		9CD0FC201954CBA9007C3B00 /* theCoins.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = theCoins.png; sourceTree = "<group>"; };
+		A5D0608E195A365D007A1950 /* clouds.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = clouds.png; sourceTree = "<group>"; };
+		A5FE630B195B7037000CC93A /* jetPackGuy.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = jetPackGuy.png; sourceTree = "<group>"; };
+		A5FE630C195B7037000CC93A /* jetPackGuyFly.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = jetPackGuyFly.png; sourceTree = "<group>"; };
+		A5FE630F195B74F9000CC93A /* FuelSprite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = FuelSprite.png; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -173,6 +181,10 @@
 		9CD0FC191954BE38007C3B00 /* Images */ = {
 			isa = PBXGroup;
 			children = (
+				A5FE630F195B74F9000CC93A /* FuelSprite.png */,
+				A5FE630B195B7037000CC93A /* jetPackGuy.png */,
+				A5FE630C195B7037000CC93A /* jetPackGuyFly.png */,
+				A5D0608E195A365D007A1950 /* clouds.png */,
 				9CD0FC201954CBA9007C3B00 /* theCoins.png */,
 			);
 			name = Images;
@@ -255,12 +267,16 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A5FE630D195B7037000CC93A /* jetPackGuy.png in Resources */,
 				9C4762DC195375F3001AD6E2 /* spark.png in Resources */,
 				9C1B773C193CF67A00977B60 /* InfoPlist.strings in Resources */,
+				A5FE630E195B7037000CC93A /* jetPackGuyFly.png in Resources */,
 				9C1B774F193CF67A00977B60 /* Images.xcassets in Resources */,
 				9C4762DB195375F3001AD6E2 /* PlayerSKS.sks in Resources */,
 				9C1B7745193CF67A00977B60 /* Main.storyboard in Resources */,
 				9CD0FC211954CBA9007C3B00 /* theCoins.png in Resources */,
+				A5FE6310195B74F9000CC93A /* FuelSprite.png in Resources */,
+				A5D0608F195A365D007A1950 /* clouds.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -410,6 +426,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "spritKitTut/spritKitTut-Prefix.pch";
 				INFOPLIST_FILE = "spritKitTut/spritKitTut-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SPRITEKIT_TEXTURE_ATLAS_OUTPUT = YES;
 				WRAPPER_EXTENSION = app;
@@ -424,6 +441,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "spritKitTut/spritKitTut-Prefix.pch";
 				INFOPLIST_FILE = "spritKitTut/spritKitTut-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SPRITEKIT_TEXTURE_ATLAS_OUTPUT = YES;
 				WRAPPER_EXTENSION = app;
@@ -446,6 +464,7 @@
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = "spritKitTutTests/spritKitTutTests-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUNDLE_LOADER)";
 				WRAPPER_EXTENSION = xctest;
@@ -464,6 +483,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "spritKitTut/spritKitTut-Prefix.pch";
 				INFOPLIST_FILE = "spritKitTutTests/spritKitTutTests-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUNDLE_LOADER)";
 				WRAPPER_EXTENSION = xctest;
