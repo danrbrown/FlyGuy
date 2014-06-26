@@ -26,12 +26,10 @@
         [self addChild:background];
         
         /* Set Varables */
-        moveToX = -10;
-        lives = 1;
+        moveToX = -30;
         gameOver = YES;
         
         /* Exacute */
-        [self makeCoins];
         [self makeGameLabels];
         [self makePlayer];
 
@@ -46,171 +44,76 @@
 -(void) addCoinsIn
 {
     
-    int randomCoin = arc4random() % 3;
+    int randomSprite = arc4random() % 3;
     int randomSpeed = (arc4random()%(4-2))+2;
     
-    [self sendCoinAtRow:randomCoin atSpeed:randomSpeed];
+    [self sendInRockOrFuel:randomSprite atSpeed:randomSpeed];
     
 }
 
--(void) sendCoinAtRow:(int)row atSpeed:(int)speed
+-(void) sendInRockOrFuel:(int)either atSpeed:(int)speed
 {
     
-    if (lives > 0)
+    if (either == 1 || either == 2)
     {
-    
-        CURRENT_COIN = row;
-
-        if (row == 0 && !ROW_ZERO)
-        {
-            
-            ROW_ZERO = YES;
-            
-            TopCoin.position = CGPointMake(340, 326);
-            [self addChild:TopCoin];
-            
-            SKAction *moveObstacle = [SKAction moveToX:moveToX duration:speed];
-            [TopCoin runAction:moveObstacle];
-            
-            [TopCoin runAction:moveObstacle completion:^(void){
-                
-                [TopCoin removeFromParent];
-                ROW_ZERO = NO;
-                lives--;
-                
-            }];
-            
-        }
-        else if (row == 1 && !ROW_ONE)
-        {
-            
-            ROW_ONE = YES;
-
-            MidCoin.position = CGPointMake(340, 280);
-            [self addChild:MidCoin];
-            
-            SKAction *moveObstacle = [SKAction moveToX:moveToX duration:speed];
-            [MidCoin runAction:moveObstacle];
-            
-            [MidCoin runAction:moveObstacle completion:^(void){
-                
-                [MidCoin removeFromParent];
-                ROW_ONE = NO;
-                lives--;
-            
-            }];
-            
-        }
-        else if (row == 2 && !ROW_TWO)
-        {
-            
-            ROW_TWO = YES;
-
-            BotCoin.position = CGPointMake(340, 226);
-            [self addChild:BotCoin];
-            
-            SKAction *moveObstacle = [SKAction moveToX:moveToX duration:speed];
-            [BotCoin runAction:moveObstacle];
-            
-            [BotCoin runAction:moveObstacle completion:^(void){
-                
-                [BotCoin removeFromParent];
-                ROW_TWO = NO;
-                lives--;
-                
-            }];
-            
-        }
-
-        NSLog(@"lives: %i", lives);
         
-        [self performSelector:@selector(addCoinsIn) withObject:self afterDelay:1.5];
+        fuelOrRock = [SKSpriteNode spriteNodeWithImageNamed:@"RockSprite"];
         
     }
     else
     {
         
-#pragma mark Game Over
-        
-        gameOver = YES;
-        
-        [self addChild:GameOverLabel];
-        [self addChild:YourScoreWasLabel];
-        [self addChild:tapToPlayLabel];
-        [self addChild:YourHighScoreWasLabel];
-                                                     
-        [scoreLabel removeFromParent];
-        
-        player.physicsBody.affectedByGravity = YES;
-        
-        [self performSelector:@selector(removeFromParent) withObject:self afterDelay:1];
+        fuelOrRock = [SKSpriteNode spriteNodeWithImageNamed:@"FuelSprite"];
         
     }
     
-}
-
-#pragma mark Movement
-
--(void) jump
-{
+    int randomPosition = (arc4random()%(340-210)) + 210;
+    fuelOrRock.position = CGPointMake(340, randomPosition);
+    [self addChild:fuelOrRock];
     
-    if (player.frame.origin.y <= 284 && player.frame.origin.y >= 230)
-    {
-        
-        SKAction *moveObstacle = [SKAction moveToY:330 duration:0.3];
-        
-        [player runAction:moveObstacle];
-        
-    }
-    else if (player.frame.origin.y <= 230)
-    {
-        
-        SKAction *moveObstacle = [SKAction moveToY:284 duration:0.3];
-        
-        [player runAction:moveObstacle];
-        
-    }
+    SKAction *moveObstacle = [SKAction moveToX:moveToX duration:speed];
+    [fuelOrRock runAction:moveObstacle];
     
-}
-
--(void) down
-{
-
-    if (player.frame.origin.y >= 230 && player.frame.origin.y <= 284)
-    {
-     
-        SKAction *moveObstacle = [SKAction moveToY:230 duration:0.3];
+    [self performSelector:@selector(addCoinsIn) withObject:self afterDelay:1.5];
+    
+#pragma mark Game over code
+    /*
         
-        [player runAction:moveObstacle];
+    gameOver = YES;
+    
+    [self addChild:GameOverLabel];
+    [self addChild:YourScoreWasLabel];
+    [self addChild:tapToPlayLabel];
+    [self addChild:YourHighScoreWasLabel];
+                                                 
+    [scoreLabel removeFromParent];
+    
+    player.physicsBody.affectedByGravity = YES;
+    
+    [self performSelector:@selector(removeFromParent) withObject:self afterDelay:1];
         
-    }
-    else if (player.frame.origin.y <= 330)
-    {
-        
-        SKAction *moveObstacle = [SKAction moveToY:284 duration:0.3];
-        
-        [player runAction:moveObstacle];
-        
-    }
+     */
     
 }
 
 #pragma mark Play Again
 
--(void) touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
-{
+-(void) touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
     
-    if (gameOver)
+#pragma mark When you want to play again code
+    /*
+    [GameOverLabel removeFromParent];
+    [YourScoreWasLabel removeFromParent];
+    [tapToPlayLabel removeFromParent];
+    [YourHighScoreWasLabel removeFromParent];
+    */
+    
+    if (!playing)
     {
         
-        gameOver = NO;
-        lives = 3;
+        playing = YES;
         
-        [GameOverLabel removeFromParent];
-        [YourScoreWasLabel removeFromParent];
-        [tapToPlayLabel removeFromParent];
         [tapToPlayFirstLabel removeFromParent];
-        [YourHighScoreWasLabel removeFromParent];
         
         [self addChild:scoreLabel];
         
@@ -222,8 +125,7 @@
     
 }
 
--(void) startPlayerPosition
-{
+-(void) startPlayerPosition {
     
     player.physicsBody.affectedByGravity = NO;
     
@@ -244,16 +146,6 @@
 }
 
 #pragma mark Labels and Players
-
--(void) makeCoins {
-    
-    TopCoin = [SKSpriteNode spriteNodeWithImageNamed:@"FuelSprite"];
-
-    MidCoin = [SKSpriteNode spriteNodeWithImageNamed:@"FuelSprite"];
-    
-    BotCoin = [SKSpriteNode spriteNodeWithImageNamed:@"FuelSprite"];
-    
-}
 
 -(void) makeGameLabels {
     
@@ -300,18 +192,13 @@
     tapToPlayFirstLabel.fontColor = [SKColor blueColor];
     tapToPlayFirstLabel.fontSize = 17;
     [self addChild:tapToPlayFirstLabel];
-    
-    float y = tapToPlayFirstLabel.position.y;
+
     float x = tapToPlayLabel.position.y;
-    SKAction *a = [SKAction moveToY:(y+5) duration:0.5];
-    SKAction *b = [SKAction moveToY:y duration:0.5];
-    SKAction *sequence = [SKAction sequence:@[a,b]];
     
     SKAction *aa = [SKAction moveToY:(x+5) duration:0.5];
     SKAction *bb = [SKAction moveToY:x duration:0.5];
     SKAction *sequence2 = [SKAction sequence:@[aa,bb]];
-    
-    [tapToPlayFirstLabel runAction:[SKAction repeatActionForever:sequence]];
+
     [tapToPlayLabel runAction:[SKAction repeatActionForever:sequence2]];
     
 }
@@ -325,11 +212,15 @@
     player.position = CGPointMake(40, self.size.height/2);
     [self addChild:player];
     
+    float y = player.position.y;
+    SKAction *a = [SKAction moveToY:(y+5) duration:0.5];
+    SKAction *b = [SKAction moveToY:y duration:0.5];
+    SKAction *sequence = [SKAction sequence:@[a,b]];
+    [player runAction:[SKAction repeatActionForever:sequence]];
+    
 }
 
 #pragma mark Moving Backround
-
-//not yet
 
 #pragma mark other
 
@@ -340,16 +231,6 @@
 }
 
 -(void) didMoveToView:(SKView *)view {
-    
-    swipeUp = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(jump)];
-    [swipeUp setDirection: UISwipeGestureRecognizerDirectionUp];
-    
-    [view addGestureRecognizer:swipeUp];
-    
-    swipeDown = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(down)];
-    [swipeDown setDirection: UISwipeGestureRecognizerDirectionDown];
-    
-    [view addGestureRecognizer:swipeDown];
     
 }
 

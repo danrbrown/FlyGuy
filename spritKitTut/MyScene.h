@@ -14,9 +14,7 @@
     UISwipeGestureRecognizer* swipeDown;
     
     SKSpriteNode *player;
-    SKSpriteNode *TopCoin;
-    SKSpriteNode *MidCoin;
-    SKSpriteNode *BotCoin;
+    SKSpriteNode *fuelOrRock;
     
     SKLabelNode *scoreLabel;
     SKLabelNode *GameOverLabel;
@@ -27,11 +25,11 @@
     
     int moveToX;
     int score;
-    int lives;
 
     int CURRENT_COIN;
     BOOL ROW_ZERO, ROW_ONE, ROW_TWO;
     BOOL gameOver;
+    BOOL playing;
     
     NSTimeInterval _lastUpdateTime;
     NSTimeInterval _dt;
