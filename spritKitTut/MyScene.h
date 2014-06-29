@@ -7,34 +7,43 @@
 //
 
 #import <SpriteKit/SpriteKit.h>
+#import "FMMParallaxNode.h"
 
 @interface MyScene : SKScene <SKPhysicsContactDelegate> {
-
-    UISwipeGestureRecognizer* swipeUp;
-    UISwipeGestureRecognizer* swipeDown;
     
     SKSpriteNode *player;
-    SKSpriteNode *fuelOrRock;
+    SKSpriteNode *fuelSrite;
+    SKSpriteNode *rockSprite;
+    SKSpriteNode *timesTwoSprite;
     
     SKLabelNode *scoreLabel;
     SKLabelNode *GameOverLabel;
     SKLabelNode *YourScoreWasLabel;
     SKLabelNode *YourHighScoreWasLabel;
     SKLabelNode *tapToPlayLabel;
-    SKLabelNode *tapToPlayFirstLabel;
+    SKSpriteNode *tapToPlayFirstLabel;
+    
+    SKShapeNode *fuelTank;
     
     int moveToX;
     int score;
+    int highscore;
+    int fuel;
+    int maxFuel;
 
-    int CURRENT_COIN;
-    BOOL ROW_ZERO, ROW_ONE, ROW_TWO;
     BOOL gameOver;
     BOOL playing;
+    BOOL done;
+    BOOL unlockedTwo;
     
-    NSTimeInterval _lastUpdateTime;
-    NSTimeInterval _dt;
-    CGPoint _velocity;
+    FMMParallaxNode *_parallaxNodeBackgrounds;
+    FMMParallaxNode *_parallaxSpaceDust;
     
 }
+
+typedef enum : uint8_t {
+    JCColliderTypeRectangle = 1,
+    JCColliderTypeObstacle  = 2
+} JCColliderType;
 
 @end
