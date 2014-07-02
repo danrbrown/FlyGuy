@@ -26,6 +26,10 @@
 		9C4762DB195375F3001AD6E2 /* PlayerSKS.sks in Resources */ = {isa = PBXBuildFile; fileRef = 9C4762D9195375F3001AD6E2 /* PlayerSKS.sks */; };
 		9C4762DC195375F3001AD6E2 /* spark.png in Resources */ = {isa = PBXBuildFile; fileRef = 9C4762DA195375F3001AD6E2 /* spark.png */; };
 		9CD0FC211954CBA9007C3B00 /* theCoins.png in Resources */ = {isa = PBXBuildFile; fileRef = 9CD0FC201954CBA9007C3B00 /* theCoins.png */; };
+		9CD0FC251961E64C007C3B00 /* FuelEmptySprite.png in Resources */ = {isa = PBXBuildFile; fileRef = 9CD0FC221961E64C007C3B00 /* FuelEmptySprite.png */; };
+		9CD0FC261961E64C007C3B00 /* FuelFullSprite.png in Resources */ = {isa = PBXBuildFile; fileRef = 9CD0FC231961E64C007C3B00 /* FuelFullSprite.png */; };
+		9CD0FC271961E64C007C3B00 /* FuelMidSprite.png in Resources */ = {isa = PBXBuildFile; fileRef = 9CD0FC241961E64C007C3B00 /* FuelMidSprite.png */; };
+		9CD0FC291961E656007C3B00 /* FuelTankSprite.png in Resources */ = {isa = PBXBuildFile; fileRef = 9CD0FC281961E656007C3B00 /* FuelTankSprite.png */; };
 		A56A55AF1960C42B007DBBFA /* timesTwoSprite.png in Resources */ = {isa = PBXBuildFile; fileRef = A56A55AE1960C42B007DBBFA /* timesTwoSprite.png */; };
 		A579F7DE195D13A400B62B8D /* FMMParallaxNode.m in Sources */ = {isa = PBXBuildFile; fileRef = A579F7DD195D13A400B62B8D /* FMMParallaxNode.m */; };
 		A579F7E3195E0D9800B62B8D /* clouds.png in Resources */ = {isa = PBXBuildFile; fileRef = A579F7E2195E0D9800B62B8D /* clouds.png */; };
@@ -72,6 +76,10 @@
 		9C4762D9195375F3001AD6E2 /* PlayerSKS.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = PlayerSKS.sks; sourceTree = "<group>"; };
 		9C4762DA195375F3001AD6E2 /* spark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = spark.png; sourceTree = "<group>"; };
 		9CD0FC201954CBA9007C3B00 /* theCoins.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = theCoins.png; sourceTree = "<group>"; };
+		9CD0FC221961E64C007C3B00 /* FuelEmptySprite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = FuelEmptySprite.png; sourceTree = "<group>"; };
+		9CD0FC231961E64C007C3B00 /* FuelFullSprite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = FuelFullSprite.png; sourceTree = "<group>"; };
+		9CD0FC241961E64C007C3B00 /* FuelMidSprite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = FuelMidSprite.png; sourceTree = "<group>"; };
+		9CD0FC281961E656007C3B00 /* FuelTankSprite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = FuelTankSprite.png; sourceTree = "<group>"; };
 		A56A55AE1960C42B007DBBFA /* timesTwoSprite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = timesTwoSprite.png; sourceTree = "<group>"; };
 		A579F7DD195D13A400B62B8D /* FMMParallaxNode.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FMMParallaxNode.m; sourceTree = "<group>"; };
 		A579F7DF195D199B00B62B8D /* FMMParallaxNode.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FMMParallaxNode.h; sourceTree = "<group>"; };
@@ -192,6 +200,10 @@
 		9CD0FC191954BE38007C3B00 /* Images */ = {
 			isa = PBXGroup;
 			children = (
+				9CD0FC221961E64C007C3B00 /* FuelEmptySprite.png */,
+				9CD0FC231961E64C007C3B00 /* FuelFullSprite.png */,
+				9CD0FC241961E64C007C3B00 /* FuelMidSprite.png */,
+				9CD0FC281961E656007C3B00 /* FuelTankSprite.png */,
 				A56A55AE1960C42B007DBBFA /* timesTwoSprite.png */,
 				A579F7E4195E0EF800B62B8D /* TapToPlaySprite.png */,
 				A579F7E2195E0D9800B62B8D /* clouds.png */,
@@ -281,10 +293,14 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9CD0FC291961E656007C3B00 /* FuelTankSprite.png in Resources */,
 				A5FE630D195B7037000CC93A /* jetPackGuy.png in Resources */,
+				9CD0FC271961E64C007C3B00 /* FuelMidSprite.png in Resources */,
 				9C4762DC195375F3001AD6E2 /* spark.png in Resources */,
 				9C1B773C193CF67A00977B60 /* InfoPlist.strings in Resources */,
 				A5FE630E195B7037000CC93A /* jetPackGuyFly.png in Resources */,
+				9CD0FC251961E64C007C3B00 /* FuelEmptySprite.png in Resources */,
+				9CD0FC261961E64C007C3B00 /* FuelFullSprite.png in Resources */,
 				9C1B774F193CF67A00977B60 /* Images.xcassets in Resources */,
 				9C4762DB195375F3001AD6E2 /* PlayerSKS.sks in Resources */,
 				9C1B7745193CF67A00977B60 /* Main.storyboard in Resources */,

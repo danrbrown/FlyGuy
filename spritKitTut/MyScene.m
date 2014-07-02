@@ -8,6 +8,10 @@
 
 #import "MyScene.h"
 
+static const uint32_t fuelCategory       =  0x1 << 2;
+static const uint32_t rockCategory       =  0x1 << 1;
+static const uint32_t playerCategory     =  0x1 << 0;
+
 @implementation MyScene
 
 -(id)initWithSize:(CGSize)size {
@@ -15,21 +19,25 @@
     if (self = [super initWithSize:size])
     {
         
-        /* Setup your scene here */
+        /* Setup scene */
         self.backgroundColor = [SKColor colorWithRed: 100.0/255.0 green: 200.0/255.0 blue:255.0/255.0 alpha: 1.0];
-        self.physicsBody = [SKPhysicsBody bodyWithEdgeLoopFromRect:self.frame];
+        
+        /* Collision */
         self.physicsWorld.contactDelegate = self;
         
         /* Set Varables */
         moveToX = -30;
-        gameOver = YES;
         maxFuel = 40;
+        x = self.size.width/2/2/2-15;
         fuel = maxFuel;
+        halfFuel = maxFuel/2;
+        almostDoneFuel = maxFuel/2/2;
         done = YES;
+        gameOver = YES;
         unlockedTwo = NO;
+        hit = NO;
         
         /* Exacute */
-        [self moveBackground];
         [self makeGameLabels];
         [self makePlayer];
 
@@ -39,19 +47,31 @@
 
 }
 
-#pragma mark Send Them Coins In
+#pragma mark Send them coins in
 
 -(void) addSpritesIn {
     
-    if (score > 50)
-    {
-        unlockedTwo = YES;
-    }
     
     int randomSprite = arc4random() % 6;
     int randomSpeed = (arc4random()%(4-2))+2;
     
     [self sendInRockOrFuel:randomSprite atSpeed:randomSpeed];
+    
+    rockSprite.physicsBody = [SKPhysicsBody bodyWithRectangleOfSize:rockSprite.size];
+    rockSprite.physicsBody.dynamic = YES;
+    rockSprite.physicsBody.affectedByGravity = NO;
+    rockSprite.physicsBody.categoryBitMask = rockCategory;
+    rockSprite.physicsBody.contactTestBitMask = playerCategory;
+    rockSprite.physicsBody.collisionBitMask = 0;
+    rockSprite.physicsBody.usesPreciseCollisionDetection = YES;
+    
+    fuelSrite.physicsBody = [SKPhysicsBody bodyWithRectangleOfSize:fuelSrite.size];
+    fuelSrite.physicsBody.dynamic = YES;
+    fuelSrite.physicsBody.affectedByGravity = NO;
+    fuelSrite.physicsBody.categoryBitMask = fuelCategory;
+    fuelSrite.physicsBody.contactTestBitMask = playerCategory;
+    fuelSrite.physicsBody.collisionBitMask = 0;
+    fuelSrite.physicsBody.usesPreciseCollisionDetection = YES;
     
 }
 
@@ -60,7 +80,7 @@
     SKAction *moveObstacle;
     int randomPosition = (arc4random()%(340-210)) + 210;
     
-    if (either == 1 || either == 2 || either == 3 || either == 4)
+    if (either == 1 || either == 2 || either == 3)
     {
         
         moveObstacle = [SKAction moveToX:moveToX duration:speed];
@@ -73,7 +93,7 @@
         [rockSprite runAction:moveObstacle withKey:@"moveing"];
         
     }
-    else if (either == 5)
+    else if (either == 5 || either == 4)
     {
         
         moveObstacle = [SKAction moveToX:moveToX duration:speed];
@@ -86,19 +106,6 @@
         [fuelSrite runAction:moveObstacle withKey:@"moveing"];
         
     }
-    else if (either == 6 && unlockedTwo)
-    {
-        
-        moveObstacle = [SKAction moveToX:moveToX duration:speed];
-        timesTwoSprite = [SKSpriteNode spriteNodeWithImageNamed:@"timesTwoSprite"];
-        timesTwoSprite.size = CGSizeMake(25, 20);
-        timesTwoSprite.position = CGPointMake(340, randomPosition);
-        
-        [self addChild:timesTwoSprite];
-        
-        [timesTwoSprite runAction:moveObstacle withKey:@"moveing"];
-        
-    }
     
     [rockSprite runAction:moveObstacle completion:^(void){
        
@@ -107,16 +114,16 @@
         
     }];
     
-    if (!gameOver)
+    if (!gameOver && !hit)
     {
         
-        [self performSelector:@selector(addSpritesIn) withObject:self afterDelay:1.5];
+        [self performSelector:@selector(addSpritesIn) withObject:self afterDelay:0.8];
     
     }
     
 }
 
-#pragma mark Play Again
+#pragma mark Play, play again
 
 -(void) touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
     
@@ -128,8 +135,13 @@
         scoreLabel.text = [NSString stringWithFormat:@"%i", score];
         playing = YES;
         gameOver = NO;
+        hit = NO;
         unlockedTwo = NO;
         player.physicsBody.affectedByGravity = YES;
+        player.physicsBody.dynamic = YES;
+        
+        [fuelLevel setTexture:[SKTexture textureWithImageNamed:@"FuelFullSprite"]];
+        x = self.size.width/2/2/2-15;
         
         [GameOverLabel removeFromParent];
         [YourScoreWasLabel removeFromParent];
@@ -139,16 +151,33 @@
         [player removeAllActions];
         
         [self addChild:scoreLabel];
-        [self performSelector:@selector(addSpritesIn) withObject:self afterDelay:2];
+        [self performSelector:@selector(addSpritesIn) withObject:self afterDelay:1];
         
     }
-    else if (playing && fuel > 0)
+    else if (playing && !hit && fuel >= 5)
     {
         
         [player.physicsBody applyImpulse:CGVectorMake(0.0f, 15.0f)];
         fuel--;
+        fuelLevel.size = CGSizeMake(fuel-4, 6);
+        fuelLevel.position = CGPointMake(x = x - 0.5, self.size.height/2-80);
         
-        if (fuel <= 0)
+        [player setTexture:[SKTexture textureWithImageNamed:@"jetPackGuyFly"]];
+        
+        if (fuel <= halfFuel && fuel > almostDoneFuel)
+        {
+            
+            [fuelLevel setTexture:[SKTexture textureWithImageNamed:@"FuelMidSprite"]];
+            
+        }
+        else if (fuel <= almostDoneFuel)
+        {
+            
+            [fuelLevel setTexture:[SKTexture textureWithImageNamed:@"FuelEmptySprite"]];
+            
+        }
+        
+        if (fuel <= 5)
         {
             
             gameOver = YES;
@@ -156,7 +185,7 @@
         }
         
     }
-    else if (gameOver && playing)
+    else if (gameOver)
     {
         
         [self gameOver];
@@ -165,13 +194,14 @@
     
 }
 
--(void) touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event {
+-(void) touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
+{
     
-    
+    [player setTexture:[SKTexture textureWithImageNamed:@"jetPackGuy"]];
     
 }
 
-#pragma mark Game Over
+#pragma mark Game over
 
 -(void) gameOver {
     
@@ -184,15 +214,16 @@
         
     }
     
+    [scoreLabel removeFromParent];
+    [fuelSrite removeFromParent];
+    [rockSprite removeFromParent];
+    
     [self addChild:GameOverLabel];
     [self addChild:YourScoreWasLabel];
     [self addChild:tapToPlayLabel];
     [self addChild:YourHighScoreWasLabel];
     
-    [scoreLabel removeFromParent];
-    [fuelSrite removeFromParent];
-    [rockSprite removeFromParent];
-    
+    gameOver = NO;
     playing = NO;
     done = NO;
     
@@ -200,14 +231,103 @@
     
 }
 
-#pragma mark Contact
-
--(void) didBeginContact:(SKPhysicsContact *)contact {
+-(void) setPlayer {
     
+    player.physicsBody.affectedByGravity = NO;
+    player.physicsBody.dynamic = NO;
+    SKAction *moveEm = [SKAction moveToY:self.size.height/2 duration:1];
+    [player runAction:moveEm];
+    
+    [player runAction:moveEm completion:^(void){
+        
+        done = YES;
+        gameOver = NO;
+        playing = NO;
+        
+    }];
     
 }
 
-#pragma mark Labels and Players
+#pragma mark Collision
+
+-(void) didBeginContact:(SKPhysicsContact *)contact {
+    
+    SKPhysicsBody *firstBody, *secondBody, *thirdBody;
+    
+    if (contact.bodyA.categoryBitMask < contact.bodyB.categoryBitMask)
+    {
+        firstBody = contact.bodyA;
+        secondBody = contact.bodyB;
+        thirdBody = contact.bodyB;
+        
+    }
+    else
+    {
+        firstBody = contact.bodyB;
+        secondBody = contact.bodyA;
+        thirdBody = contact.bodyA;
+    }
+    
+    if ((firstBody.categoryBitMask & playerCategory) != 0 && (secondBody.categoryBitMask & rockCategory) != 0)
+    {
+        [self collision:(SKSpriteNode *) firstBody.node didCollideWithRock:(SKSpriteNode *) secondBody.node];
+    }
+    
+    if ((firstBody.categoryBitMask & playerCategory) != 0 && (thirdBody.categoryBitMask & fuelCategory) != 0)
+    {
+        [self collision:(SKSpriteNode *) firstBody.node didCollideWithFuel:(SKSpriteNode *) secondBody.node];
+    }
+    
+}
+
+#pragma mark Collision between player and rock
+
+-(void) collision:(SKSpriteNode *)player didCollideWithRock:(SKSpriteNode *)rock {
+    
+    if (!hit)
+    {
+        
+        hit = YES;
+        self.paused = YES;
+        [self performSelector:@selector(hit) withObject:self afterDelay:1];
+        
+    }
+    
+}
+
+-(void) hit
+{
+    
+    self.paused = NO;
+    gameOver = NO;
+    [self gameOver];
+    
+}
+
+#pragma mark Collision bteween player and fuel
+
+-(void) collision:(SKSpriteNode *)player didCollideWithFuel:(SKSpriteNode *)fuelBox {
+
+    if (fuel < maxFuel - 7)
+    {
+
+        fuel = fuel + 7;
+        fuelLevel.size = CGSizeMake(fuel-4, 6);
+        fuelLevel.position = CGPointMake(x = x + 3.5, self.size.height/2-80);
+    
+    }
+    else
+    {
+        
+        fuel = fuel + 2;
+        fuelLevel.size = CGSizeMake(fuel-4, 6);
+        fuelLevel.position = CGPointMake(x = x + 1, self.size.height/2-80);
+        
+    }
+    
+}
+
+#pragma mark Labels
 
 -(void) makeGameLabels {
     
@@ -241,33 +361,43 @@
     YourHighScoreWasLabel.fontSize = 13;
     
     /* Make Tap Play Again Label */
-    tapToPlayLabel = [SKLabelNode labelNodeWithFontNamed:@"Helvetica"];
-    tapToPlayLabel.text = @"Tap to play again!";
+    tapToPlayLabel = [SKSpriteNode spriteNodeWithImageNamed:@"TapToPlaySprite"];
     tapToPlayLabel.position = CGPointMake(self.size.width/2, self.size.height/2-70);
-    tapToPlayLabel.fontColor = [SKColor purpleColor];
-    tapToPlayLabel.fontSize = 10;
+    tapToPlayLabel.size = CGSizeMake(100, 15);
     
     /* Make Tap Play First Label and Animation */
     tapToPlayFirstLabel = [SKSpriteNode spriteNodeWithImageNamed:@"TapToPlaySprite"];
     tapToPlayFirstLabel.position = CGPointMake(self.size.width/2, self.size.height/2);
     tapToPlayFirstLabel.size = CGSizeMake(120, 20);
     [self addChild:tapToPlayFirstLabel];
-
-    float y = tapToPlayLabel.position.y;
-    SKAction *aa = [SKAction moveToY:(y+5) duration:0.5];
-    SKAction *bb = [SKAction moveToY:y duration:0.5];
-    SKAction *sequence2 = [SKAction sequence:@[aa,bb]];
-    [tapToPlayLabel runAction:[SKAction repeatActionForever:sequence2]];
+    
+    /* Make Fuel Tank */
+    fuelTank = [SKSpriteNode spriteNodeWithImageNamed:@"FuelTankSprite"];
+    fuelTank.position = CGPointMake(self.size.width/2/2/2-15, self.size.height/2-80);
+    fuelTank.size = CGSizeMake(40, 10);
+    [self addChild:fuelTank];
+    
+    fuelLevel = [SKSpriteNode spriteNodeWithImageNamed:@"FuelFullSprite"];
+    fuelLevel.position = CGPointMake(self.size.width/2/2/2-15, self.size.height/2-80);
+    fuelLevel.size = CGSizeMake(fuel-4, 6);
+    [self addChild:fuelLevel];
     
 }
 
+#pragma mark Make player
+
 -(void) makePlayer {
     
-    /* Make Player (for now) */
-    player = [SKSpriteNode spriteNodeWithImageNamed:@"jetPackGuyFly"];
+    player = [SKSpriteNode spriteNodeWithImageNamed:@"jetPackGuy"];
+    player.position = CGPointMake(40, self.size.height/2);
+
     player.physicsBody = [SKPhysicsBody bodyWithRectangleOfSize:player.size];
     player.physicsBody.affectedByGravity = NO;
-    player.position = CGPointMake(40, self.size.height/2);
+    player.physicsBody.dynamic = YES;
+    player.physicsBody.categoryBitMask = playerCategory;
+    player.physicsBody.contactTestBitMask = rockCategory;
+    player.physicsBody.collisionBitMask = 0;
+    
     [self addChild:player];
     
     float y = player.position.y;
@@ -278,43 +408,21 @@
     
 }
 
-#pragma mark Moving Backround
+#pragma mark Moving backround
 
 -(void) moveBackground {
     
-    SKSpriteNode *backround = [SKSpriteNode spriteNodeWithImageNamed:@"clouds"];
-    backround.position = CGPointMake(340, self.size.height/2);
-    backround.size = CGSizeMake(1000, 180);
-    [self addChild:backround];
     
-    SKAction *moveIt = [SKAction moveToX:-1000 duration:10];
-    [backround runAction:moveIt];
     
 }
 
-#pragma mark other
-
--(void) setPlayer {
-    
-    player.physicsBody.affectedByGravity = NO;
-    SKAction *moveEm = [SKAction moveToY:self.size.height/2 duration:1];
-    [player runAction:moveEm];
-    
-    [player runAction:moveEm completion:^(void){
-        
-        done = YES;
-        gameOver = NO;
-        playing = NO;
-        
-    }];
-    
-}
+#pragma mark Other
 
 -(void) didMoveToView:(SKView *)view {
     
 }
  
--(void)update:(NSTimeInterval)currentTime {
+-(void) update:(NSTimeInterval)currentTime {
     
     
 }
