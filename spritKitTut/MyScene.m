@@ -44,6 +44,7 @@ static const uint32_t playerCategory     =  0x1 << 0;
         highscore = theHighScore;
   
         /* Exacute */
+        //[self moveBackground];
         [self makeGameLabels];
         [self makePlayer];
 
@@ -262,6 +263,11 @@ static const uint32_t playerCategory     =  0x1 << 0;
 
 -(void) collision:(SKSpriteNode *)playerS didCollideWithRock:(SKSpriteNode *)rockS {
     
+    player.alpha = 0.0;
+    
+    SKAction *blinkSequence = [SKAction sequence:@[[SKAction fadeAlphaTo:1.0 duration:0],
+                                                   [SKAction fadeAlphaTo:0.0 duration:0],
+                                                   [SKAction fadeAlphaTo:1.0 duration:0]]];
     
     if (lives == 3)
     {
@@ -276,23 +282,27 @@ static const uint32_t playerCategory     =  0x1 << 0;
         [lifeONE removeFromParent];
     }
 
+    [player runAction:[SKAction repeatAction:blinkSequence count:5] completion:^{}];
+    
     lives--;
 
     if (!hit && lives < 1)
     {
         
         hit = YES;
+        
         SKAction *rotation = [SKAction rotateByAngle: M_PI/2.0 duration:0.4];
         SKAction *moveByHit = [SKAction moveToX:player.position.x-10 duration:0.4];
         SKAction *playerWasHit = [SKAction sequence:@[rotation, moveByHit]];
         [player runAction:playerWasHit];
-        [self performSelector:@selector(hit) withObject:self afterDelay:0.2];
+        
+        [self performSelector:@selector(yourDone) withObject:self afterDelay:0.2];
         
     }
     
 }
 
--(void) hit
+-(void) yourDone
 {
     
     gameOver = NO;
@@ -393,7 +403,24 @@ static const uint32_t playerCategory     =  0x1 << 0;
 
 -(void) moveBackground {
     
+    NSArray *parallaxBackgroundNames = @[@"cloudOne", @"cloudTwo", @"cloudThree", @"cloudOne", @"cloudTwo", @"cloudThree"];
+    CGSize planetSizes = CGSizeMake(50, 50);
+
+    _parallaxNodeBackgrounds = [[FMMParallaxNode alloc] initWithBackgrounds:parallaxBackgroundNames
+                                                                       size:planetSizes
+                                                       pointsPerSecondSpeed:25.0];
+
+    _parallaxNodeBackgrounds.position = CGPointMake(self.size.width/2.0+220, self.size.height/2.0-150);
+
+    [_parallaxNodeBackgrounds randomizeNodesPositions];
+
+    [self addChild:_parallaxNodeBackgrounds];
     
+}
+
+-(void) update:(NSTimeInterval)currentTime {
+    
+    [_parallaxNodeBackgrounds update:currentTime];
     
 }
 
@@ -402,11 +429,8 @@ static const uint32_t playerCategory     =  0x1 << 0;
 -(void) didMoveToView:(SKView *)view {
     
 }
- 
--(void) update:(NSTimeInterval)currentTime {
-    
-    
-}
+
+
 
 @end
 
