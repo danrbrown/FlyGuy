@@ -25,6 +25,8 @@ static const uint32_t playerCategory     =  0x1 << 0;
         self.backgroundColor = [SKColor colorWithRed: 100.0/255.0 green: 200.0/255.0 blue:255.0/255.0 alpha: 1.0];
         
         /* Collision */
+        SKPhysicsBody* borderBody = [SKPhysicsBody bodyWithEdgeLoopFromRect:self.frame];
+        self.physicsBody = borderBody;
         self.physicsWorld.contactDelegate = self;
         self.physicsWorld.gravity = CGVectorMake(0,-5);
         
@@ -102,7 +104,7 @@ static const uint32_t playerCategory     =  0x1 << 0;
     [rockSprite runAction:moveObstacle completion:^(void){
        
         score++;
-        scoreLabel.text = [NSString stringWithFormat:@"%li", score];
+        scoreLabel.text = [NSString stringWithFormat:@"%li", (long)score];
         
     }];
     
@@ -125,7 +127,7 @@ static const uint32_t playerCategory     =  0x1 << 0;
         fuel = maxFuel;
         score = 0;
         lives = 3;
-        scoreLabel.text = [NSString stringWithFormat:@"%li", score];
+        scoreLabel.text = [NSString stringWithFormat:@"%li", (long)score];
         playing = YES;
         gameOver = NO;
         hit = NO;
@@ -141,9 +143,12 @@ static const uint32_t playerCategory     =  0x1 << 0;
         [tapToPlayFirstLabel removeFromParent];
         [player removeAllActions];
         
-        [self addChild:lifeONE];
-        [self addChild:lifeTWO];
-        [self addChild:lifeTHREE];
+        SKAction *blinkSequence = [SKAction sequence:@[[SKAction fadeAlphaTo:1.0 duration:0],[SKAction fadeAlphaTo:0.0 duration:0],[SKAction fadeAlphaTo:1.0 duration:0]]];
+        
+        [lifeONE runAction:[SKAction repeatAction:blinkSequence count:5] completion:^{}];
+        [lifeTWO runAction:[SKAction repeatAction:blinkSequence count:5] completion:^{}];
+        [lifeTHREE runAction:[SKAction repeatAction:blinkSequence count:5] completion:^{}];
+        
         [self addChild:scoreLabel];
         [self performSelector:@selector(addSpritesIn) withObject:self afterDelay:1];
         
@@ -170,7 +175,7 @@ static const uint32_t playerCategory     =  0x1 << 0;
 
 -(void) gameOver {
 
-    YourScoreWasLabel.text = [NSString stringWithFormat:@"SCORE: %li", score];
+    YourScoreWasLabel.text = [NSString stringWithFormat:@"SCORE: %li", (long)score];
     
     NSInteger theHighScore = [[NSUserDefaults standardUserDefaults] integerForKey:@"HighScore"];
     highscore = theHighScore;
@@ -179,7 +184,7 @@ static const uint32_t playerCategory     =  0x1 << 0;
     {
         
         highscore = score;
-        YourHighScoreWasLabel.text = [NSString stringWithFormat:@"BEST: %li", highscore];
+        YourHighScoreWasLabel.text = [NSString stringWithFormat:@"BEST: %li", (long)highscore];
         [[NSUserDefaults standardUserDefaults] setInteger:highscore forKey:@"HighScore"];
         
     }
@@ -264,25 +269,23 @@ static const uint32_t playerCategory     =  0x1 << 0;
 -(void) collision:(SKSpriteNode *)playerS didCollideWithRock:(SKSpriteNode *)rockS {
     
     player.alpha = 0.0;
-    
-    SKAction *blinkSequence = [SKAction sequence:@[[SKAction fadeAlphaTo:1.0 duration:0],
-                                                   [SKAction fadeAlphaTo:0.0 duration:0],
-                                                   [SKAction fadeAlphaTo:1.0 duration:0]]];
+    SKAction *blinkPlayer = [SKAction sequence:@[[SKAction fadeAlphaTo:1.0 duration:0],[SKAction fadeAlphaTo:0.0 duration:0],[SKAction fadeAlphaTo:1.0 duration:0]]];
+    SKAction *blinkHeart = [SKAction sequence:@[[SKAction fadeAlphaTo:0.0 duration:0],[SKAction fadeAlphaTo:1.0 duration:0],[SKAction fadeAlphaTo:0.0 duration:0]]];
     
     if (lives == 3)
     {
-        [lifeTHREE removeFromParent];
+        [lifeTHREE runAction:[SKAction repeatAction:blinkHeart count:5] completion:^{}];
     }
     if (lives == 2)
     {
-        [lifeTWO removeFromParent];
+        [lifeTWO runAction:[SKAction repeatAction:blinkHeart count:5] completion:^{}];
     }
     if (lives == 1)
     {
-        [lifeONE removeFromParent];
+        [lifeONE runAction:[SKAction repeatAction:blinkHeart count:5] completion:^{}];
     }
 
-    [player runAction:[SKAction repeatAction:blinkSequence count:5] completion:^{}];
+    [player runAction:[SKAction repeatAction:blinkPlayer count:5] completion:^{}];
     
     lives--;
 
@@ -318,7 +321,7 @@ static const uint32_t playerCategory     =  0x1 << 0;
     
     /* Make Score Label */
     score = 0;
-    scoreLabel = [BMGlyphLabel labelWithText:[NSString stringWithFormat:@"%li", score] font:font2];
+    scoreLabel = [BMGlyphLabel labelWithText:[NSString stringWithFormat:@"%li", (long)score] font:font2];
     scoreLabel.position = CGPointMake(self.size.width/2-157, self.size.height/2-77);
     scoreLabel.horizontalAlignment = BMGlyphHorizontalAlignmentLeft;
     
@@ -327,12 +330,12 @@ static const uint32_t playerCategory     =  0x1 << 0;
     GameOverLabel.position = CGPointMake(self.size.width/2, self.size.height/2+43);
     
     /* Make After Score Label */
-    YourScoreWasLabel = [BMGlyphLabel labelWithText:[NSString stringWithFormat:@"SCORE: %li", score] font:font2];
+    YourScoreWasLabel = [BMGlyphLabel labelWithText:[NSString stringWithFormat:@"SCORE: %li", (long)score] font:font2];
     YourScoreWasLabel.position = CGPointMake(self.size.width/2-60, self.size.height/2+13);
     YourScoreWasLabel.horizontalAlignment = BMGlyphHorizontalAlignmentLeft;
     
     /* Make After Highscore Label */
-    YourHighScoreWasLabel = [BMGlyphLabel labelWithText:[NSString stringWithFormat:@"BEST: %li", highscore] font:font2];
+    YourHighScoreWasLabel = [BMGlyphLabel labelWithText:[NSString stringWithFormat:@"BEST: %li", (long)highscore] font:font2];
     YourHighScoreWasLabel.position = CGPointMake(self.size.width/2-44.5, self.size.height/2-7);
     YourHighScoreWasLabel.horizontalAlignment = BMGlyphHorizontalAlignmentLeft;
     
@@ -362,16 +365,22 @@ static const uint32_t playerCategory     =  0x1 << 0;
     lifeONE.position = CGPointMake(self.size.width/2+145, self.size.height/2-77);
     lifeONE.size = CGSizeMake(lifeONE.size.width/2-3, lifeONE.size.height/2-3);
     lifeONE.name = @"lifeONE";
+    lifeONE.alpha = 0;
+    [self addChild:lifeONE];
     
     lifeTWO = [SKSpriteNode spriteNodeWithImageNamed:@"heartLifeSprite"];
     lifeTWO.size = CGSizeMake(lifeTWO.size.width/2-3, lifeTWO.size.height/2-3);
     lifeTWO.position = CGPointMake(self.size.width/2+125, self.size.height/2-77);
     lifeTWO.name = @"lifeFour";
+    lifeTWO.alpha = 0;
+    [self addChild:lifeTWO];
     
     lifeTHREE = [SKSpriteNode spriteNodeWithImageNamed:@"heartLifeSprite"];
     lifeTHREE.size = CGSizeMake(lifeTHREE.size.width/2-3, lifeTHREE.size.height/2-3);
     lifeTHREE.position = CGPointMake(self.size.width/2+105, self.size.height/2-77);
     lifeTHREE.name = @"lifeTHREE";
+    lifeTHREE.alpha = 0;
+    [self addChild:lifeTHREE];
     
 }
 
