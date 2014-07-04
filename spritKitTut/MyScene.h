@@ -7,33 +7,39 @@
 //
 
 #import <SpriteKit/SpriteKit.h>
+
 #import "FMMParallaxNode.h"
+#import "BMGlyphFont.h"
+#import "BMGlyphLabel.h"
 
 @interface MyScene : SKScene <SKPhysicsContactDelegate> {
     
     SKSpriteNode *player;
-    SKSpriteNode *fuelSrite;
     SKSpriteNode *rockSprite;
     SKSpriteNode *timesTwoSprite;
     
-    SKLabelNode *scoreLabel;
-    SKLabelNode *GameOverLabel;
-    SKLabelNode *YourScoreWasLabel;
-    SKLabelNode *YourHighScoreWasLabel;
-    SKSpriteNode *tapToPlayLabel;
-    SKSpriteNode *tapToPlayFirstLabel;
+    BMGlyphLabel *scoreLabel;
+    BMGlyphLabel *GameOverLabel;
+    BMGlyphLabel *YourScoreWasLabel;
+    BMGlyphLabel *YourHighScoreWasLabel;
+    BMGlyphLabel *tapToPlayFirstLabel;
+    BMGlyphLabel *tapToPlayLabel;
+    BMGlyphLabel *newHighScore;
     
-    SKSpriteNode *fuelTank;
-    SKSpriteNode *fuelLevel;
+    SKSpriteNode *gameOverBoard;
+    SKSpriteNode *lifeONE;
+    SKSpriteNode *lifeTWO;
+    SKSpriteNode *lifeTHREE;
+    
+    NSInteger score;
+    NSInteger highscore;
     
     int moveToX;
-    int score;
-    int highscore;
     int fuel;
     int maxFuel;
     int halfFuel;
     int almostDoneFuel;
-    float x;
+    int lives;
 
     BOOL gameOver;
     BOOL playing;

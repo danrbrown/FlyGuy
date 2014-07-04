@@ -8,7 +8,9 @@
 
 #import "MyScene.h"
 
-static const uint32_t fuelCategory       =  0x1 << 2;
+#import "BMGlyphFont.h"
+#import "BMGlyphLabel.h"
+
 static const uint32_t rockCategory       =  0x1 << 1;
 static const uint32_t playerCategory     =  0x1 << 0;
 
@@ -24,11 +26,12 @@ static const uint32_t playerCategory     =  0x1 << 0;
         
         /* Collision */
         self.physicsWorld.contactDelegate = self;
+        self.physicsWorld.gravity = CGVectorMake(0,-5);
         
         /* Set Varables */
         moveToX = -30;
         maxFuel = 40;
-        x = self.size.width/2/2/2-15;
+        lives = 3;
         fuel = maxFuel;
         halfFuel = maxFuel/2;
         almostDoneFuel = maxFuel/2/2;
@@ -37,6 +40,9 @@ static const uint32_t playerCategory     =  0x1 << 0;
         unlockedTwo = NO;
         hit = NO;
         
+        NSInteger theHighScore = [[NSUserDefaults standardUserDefaults] integerForKey:@"HighScore"];
+        highscore = theHighScore;
+  
         /* Exacute */
         [self makeGameLabels];
         [self makePlayer];
@@ -51,11 +57,11 @@ static const uint32_t playerCategory     =  0x1 << 0;
 
 -(void) addSpritesIn {
     
-    
     int randomSprite = arc4random() % 6;
-    int randomSpeed = (arc4random()%(4-2))+2;
+    int randomSpeed = (arc4random()%(5-2))+2;
+    float waitTime = 0.8;
     
-    [self sendInRockOrFuel:randomSprite atSpeed:randomSpeed];
+    [self sendInRockOrFuel:randomSprite atSpeed:randomSpeed waitTime:waitTime];
     
     rockSprite.physicsBody = [SKPhysicsBody bodyWithRectangleOfSize:rockSprite.size];
     rockSprite.physicsBody.dynamic = YES;
@@ -65,59 +71,44 @@ static const uint32_t playerCategory     =  0x1 << 0;
     rockSprite.physicsBody.collisionBitMask = 0;
     rockSprite.physicsBody.usesPreciseCollisionDetection = YES;
     
-    fuelSrite.physicsBody = [SKPhysicsBody bodyWithRectangleOfSize:fuelSrite.size];
-    fuelSrite.physicsBody.dynamic = YES;
-    fuelSrite.physicsBody.affectedByGravity = NO;
-    fuelSrite.physicsBody.categoryBitMask = fuelCategory;
-    fuelSrite.physicsBody.contactTestBitMask = playerCategory;
-    fuelSrite.physicsBody.collisionBitMask = 0;
-    fuelSrite.physicsBody.usesPreciseCollisionDetection = YES;
-    
 }
 
--(void) sendInRockOrFuel:(int)either atSpeed:(int)speed {
+-(void) sendInRockOrFuel:(int)either atSpeed:(int)speed waitTime:(float)wait {
     
-    SKAction *moveObstacle;
+    SKAction *moveObstacle = [SKAction moveToX:moveToX duration:speed];
     int randomPosition = (arc4random()%(340-210)) + 210;
+    rockSprite = [SKSpriteNode spriteNodeWithImageNamed:@"RockSprite"];
     
     if (either == 1 || either == 2 || either == 3)
     {
         
-        moveObstacle = [SKAction moveToX:moveToX duration:speed];
-        rockSprite = [SKSpriteNode spriteNodeWithImageNamed:@"RockSprite"];
         rockSprite.size = CGSizeMake(25, 15);
         rockSprite.position = CGPointMake(340, randomPosition);
-        
         [self addChild:rockSprite];
-        
         [rockSprite runAction:moveObstacle withKey:@"moveing"];
         
     }
-    else if (either == 5 || either == 4)
+    else if (either == 4 || either == 5)
     {
         
-        moveObstacle = [SKAction moveToX:moveToX duration:speed];
-        fuelSrite = [SKSpriteNode spriteNodeWithImageNamed:@"FuelSprite"];
-        fuelSrite.size = CGSizeMake(20, 20);
-        fuelSrite.position = CGPointMake(340, randomPosition);
-        
-        [self addChild:fuelSrite];
-        
-        [fuelSrite runAction:moveObstacle withKey:@"moveing"];
-        
+        rockSprite.size = CGSizeMake(35, 22);
+        rockSprite.position = CGPointMake(340, randomPosition);
+        [self addChild:rockSprite];
+        [rockSprite runAction:moveObstacle withKey:@"moveing"];
+
     }
     
     [rockSprite runAction:moveObstacle completion:^(void){
        
         score++;
-        scoreLabel.text = [NSString stringWithFormat:@"%i", score];
+        scoreLabel.text = [NSString stringWithFormat:@"%li", score];
         
     }];
     
     if (!gameOver && !hit)
     {
         
-        [self performSelector:@selector(addSpritesIn) withObject:self afterDelay:0.8];
+        [self performSelector:@selector(addSpritesIn) withObject:self afterDelay:wait];
     
     }
     
@@ -132,7 +123,8 @@ static const uint32_t playerCategory     =  0x1 << 0;
         
         fuel = maxFuel;
         score = 0;
-        scoreLabel.text = [NSString stringWithFormat:@"%i", score];
+        lives = 3;
+        scoreLabel.text = [NSString stringWithFormat:@"%li", score];
         playing = YES;
         gameOver = NO;
         hit = NO;
@@ -140,55 +132,27 @@ static const uint32_t playerCategory     =  0x1 << 0;
         player.physicsBody.affectedByGravity = YES;
         player.physicsBody.dynamic = YES;
         
-        [fuelLevel setTexture:[SKTexture textureWithImageNamed:@"FuelFullSprite"]];
-        x = self.size.width/2/2/2-15;
-        
         [GameOverLabel removeFromParent];
         [YourScoreWasLabel removeFromParent];
         [tapToPlayLabel removeFromParent];
         [YourHighScoreWasLabel removeFromParent];
+        [gameOverBoard removeFromParent];
         [tapToPlayFirstLabel removeFromParent];
         [player removeAllActions];
         
+        [self addChild:lifeONE];
+        [self addChild:lifeTWO];
+        [self addChild:lifeTHREE];
         [self addChild:scoreLabel];
         [self performSelector:@selector(addSpritesIn) withObject:self afterDelay:1];
         
     }
-    else if (playing && !hit && fuel >= 5)
+    else if (playing && !hit)
     {
         
-        [player.physicsBody applyImpulse:CGVectorMake(0.0f, 15.0f)];
-        fuel--;
-        fuelLevel.size = CGSizeMake(fuel-4, 6);
-        fuelLevel.position = CGPointMake(x = x - 0.5, self.size.height/2-80);
+        [player.physicsBody applyImpulse:CGVectorMake(0.0f, 10.0f)];
         
         [player setTexture:[SKTexture textureWithImageNamed:@"jetPackGuyFly"]];
-        
-        if (fuel <= halfFuel && fuel > almostDoneFuel)
-        {
-            
-            [fuelLevel setTexture:[SKTexture textureWithImageNamed:@"FuelMidSprite"]];
-            
-        }
-        else if (fuel <= almostDoneFuel)
-        {
-            
-            [fuelLevel setTexture:[SKTexture textureWithImageNamed:@"FuelEmptySprite"]];
-            
-        }
-        
-        if (fuel <= 5)
-        {
-            
-            gameOver = YES;
-            
-        }
-        
-    }
-    else if (gameOver)
-    {
-        
-        [self gameOver];
         
     }
     
@@ -204,20 +168,25 @@ static const uint32_t playerCategory     =  0x1 << 0;
 #pragma mark Game over
 
 -(void) gameOver {
+
+    YourScoreWasLabel.text = [NSString stringWithFormat:@"SCORE: %li", score];
     
-    YourScoreWasLabel.text = [NSString stringWithFormat:@"Score: %i", score];
+    NSInteger theHighScore = [[NSUserDefaults standardUserDefaults] integerForKey:@"HighScore"];
+    highscore = theHighScore;
     
-    if (score > highscore)
+    if (score > theHighScore)
     {
         
-        YourHighScoreWasLabel.text = [NSString stringWithFormat:@"Best: %i", score];
+        highscore = score;
+        YourHighScoreWasLabel.text = [NSString stringWithFormat:@"BEST: %li", highscore];
+        [[NSUserDefaults standardUserDefaults] setInteger:highscore forKey:@"HighScore"];
         
     }
     
     [scoreLabel removeFromParent];
-    [fuelSrite removeFromParent];
     [rockSprite removeFromParent];
     
+    [self addChild:gameOverBoard];
     [self addChild:GameOverLabel];
     [self addChild:YourScoreWasLabel];
     [self addChild:tapToPlayLabel];
@@ -240,9 +209,26 @@ static const uint32_t playerCategory     =  0x1 << 0;
     
     [player runAction:moveEm completion:^(void){
         
-        done = YES;
-        gameOver = NO;
-        playing = NO;
+        SKAction *rotation = [SKAction rotateByAngle: M_PI/-4.0 duration:0.7];
+        SKAction *moveFix = [SKAction moveToX:player.position.x+10 duration:0.7];
+        SKAction *playerWasFixed = [SKAction sequence:@[rotation, moveFix]];
+        [player runAction:playerWasFixed];
+        
+        [player runAction:playerWasFixed completion:^(void){
+            
+            done = YES;
+            gameOver = NO;
+            playing = NO;
+            
+            float y = player.position.y;
+            SKAction *a = [SKAction moveToY:(y+5) duration:0.5];
+            SKAction *b = [SKAction moveToY:y duration:0.5];
+            SKAction *sequence = [SKAction sequence:@[a,b]];
+            [player runAction:[SKAction repeatActionForever:sequence] withKey:@"flouting"];
+            
+        }];
+        
+        
         
     }];
     
@@ -252,20 +238,17 @@ static const uint32_t playerCategory     =  0x1 << 0;
 
 -(void) didBeginContact:(SKPhysicsContact *)contact {
     
-    SKPhysicsBody *firstBody, *secondBody, *thirdBody;
+    SKPhysicsBody *firstBody, *secondBody;
     
     if (contact.bodyA.categoryBitMask < contact.bodyB.categoryBitMask)
     {
         firstBody = contact.bodyA;
         secondBody = contact.bodyB;
-        thirdBody = contact.bodyB;
-        
     }
     else
     {
         firstBody = contact.bodyB;
         secondBody = contact.bodyA;
-        thirdBody = contact.bodyA;
     }
     
     if ((firstBody.categoryBitMask & playerCategory) != 0 && (secondBody.categoryBitMask & rockCategory) != 0)
@@ -273,23 +256,37 @@ static const uint32_t playerCategory     =  0x1 << 0;
         [self collision:(SKSpriteNode *) firstBody.node didCollideWithRock:(SKSpriteNode *) secondBody.node];
     }
     
-    if ((firstBody.categoryBitMask & playerCategory) != 0 && (thirdBody.categoryBitMask & fuelCategory) != 0)
-    {
-        [self collision:(SKSpriteNode *) firstBody.node didCollideWithFuel:(SKSpriteNode *) secondBody.node];
-    }
-    
 }
 
 #pragma mark Collision between player and rock
 
--(void) collision:(SKSpriteNode *)player didCollideWithRock:(SKSpriteNode *)rock {
+-(void) collision:(SKSpriteNode *)playerS didCollideWithRock:(SKSpriteNode *)rockS {
     
-    if (!hit)
+    
+    if (lives == 3)
+    {
+        [lifeTHREE removeFromParent];
+    }
+    if (lives == 2)
+    {
+        [lifeTWO removeFromParent];
+    }
+    if (lives == 1)
+    {
+        [lifeONE removeFromParent];
+    }
+
+    lives--;
+
+    if (!hit && lives < 1)
     {
         
         hit = YES;
-        self.paused = YES;
-        [self performSelector:@selector(hit) withObject:self afterDelay:1];
+        SKAction *rotation = [SKAction rotateByAngle: M_PI/2.0 duration:0.4];
+        SKAction *moveByHit = [SKAction moveToX:player.position.x-10 duration:0.4];
+        SKAction *playerWasHit = [SKAction sequence:@[rotation, moveByHit]];
+        [player runAction:playerWasHit];
+        [self performSelector:@selector(hit) withObject:self afterDelay:0.2];
         
     }
     
@@ -298,32 +295,8 @@ static const uint32_t playerCategory     =  0x1 << 0;
 -(void) hit
 {
     
-    self.paused = NO;
     gameOver = NO;
     [self gameOver];
-    
-}
-
-#pragma mark Collision bteween player and fuel
-
--(void) collision:(SKSpriteNode *)player didCollideWithFuel:(SKSpriteNode *)fuelBox {
-
-    if (fuel < maxFuel - 7)
-    {
-
-        fuel = fuel + 7;
-        fuelLevel.size = CGSizeMake(fuel-4, 6);
-        fuelLevel.position = CGPointMake(x = x + 3.5, self.size.height/2-80);
-    
-    }
-    else
-    {
-        
-        fuel = fuel + 2;
-        fuelLevel.size = CGSizeMake(fuel-4, 6);
-        fuelLevel.position = CGPointMake(x = x + 1, self.size.height/2-80);
-        
-    }
     
 }
 
@@ -331,56 +304,64 @@ static const uint32_t playerCategory     =  0x1 << 0;
 
 -(void) makeGameLabels {
     
+    BMGlyphFont *font2 = [BMGlyphFont fontWithName:@"FontForFlyGuy2"];
+    
     /* Make Score Label */
     score = 0;
-    scoreLabel = [SKLabelNode labelNodeWithFontNamed:@"Helvetica"];
-    scoreLabel.text = [NSString stringWithFormat:@"%i", score];
-    scoreLabel.fontSize = 17;
-    scoreLabel.fontColor = [SKColor blackColor];
-    scoreLabel.position = CGPointMake(self.size.width/2*2-10, self.size.height/2-83);
+    scoreLabel = [BMGlyphLabel labelWithText:[NSString stringWithFormat:@"%li", score] font:font2];
+    scoreLabel.position = CGPointMake(self.size.width/2-157, self.size.height/2-77);
+    scoreLabel.horizontalAlignment = BMGlyphHorizontalAlignmentLeft;
     
     /* Make Game Over Label */
-    GameOverLabel = [SKLabelNode labelNodeWithFontNamed:@"Helvetica"];
-    GameOverLabel.text = @"Game Over!";
-    GameOverLabel.position = CGPointMake(self.size.width/2, self.size.height/2+40);
-    GameOverLabel.fontColor = [SKColor blueColor];
-    GameOverLabel.fontSize = 20;
+    GameOverLabel = [BMGlyphLabel labelWithText:@"GAME OVER!" font:font2];
+    GameOverLabel.position = CGPointMake(self.size.width/2, self.size.height/2+43);
     
     /* Make After Score Label */
-    YourScoreWasLabel = [SKLabelNode labelNodeWithFontNamed:@"Helvetica"];
-    YourScoreWasLabel.text = [NSString stringWithFormat:@"Score: %i", score];
-    YourScoreWasLabel.position = CGPointMake(self.size.width/2, self.size.height/2+20);
-    YourScoreWasLabel.fontColor = [SKColor redColor];
-    YourScoreWasLabel.fontSize = 13;
+    YourScoreWasLabel = [BMGlyphLabel labelWithText:[NSString stringWithFormat:@"SCORE: %li", score] font:font2];
+    YourScoreWasLabel.position = CGPointMake(self.size.width/2-60, self.size.height/2+13);
+    YourScoreWasLabel.horizontalAlignment = BMGlyphHorizontalAlignmentLeft;
     
     /* Make After Highscore Label */
-    YourHighScoreWasLabel = [SKLabelNode labelNodeWithFontNamed:@"Helvetica"];
-    YourHighScoreWasLabel.text = [NSString stringWithFormat:@"Best: %i", score];
-    YourHighScoreWasLabel.position = CGPointMake(self.size.width/2, self.size.height/2);
-    YourHighScoreWasLabel.fontColor = [SKColor redColor];
-    YourHighScoreWasLabel.fontSize = 13;
+    YourHighScoreWasLabel = [BMGlyphLabel labelWithText:[NSString stringWithFormat:@"BEST: %li", highscore] font:font2];
+    YourHighScoreWasLabel.position = CGPointMake(self.size.width/2-44.5, self.size.height/2-7);
+    YourHighScoreWasLabel.horizontalAlignment = BMGlyphHorizontalAlignmentLeft;
     
     /* Make Tap Play Again Label */
-    tapToPlayLabel = [SKSpriteNode spriteNodeWithImageNamed:@"TapToPlaySprite"];
-    tapToPlayLabel.position = CGPointMake(self.size.width/2, self.size.height/2-70);
-    tapToPlayLabel.size = CGSizeMake(100, 15);
+    tapToPlayLabel = [BMGlyphLabel labelWithText:@"TAP TO PLAY!" font:font2];
+    tapToPlayLabel.position = CGPointMake(self.size.width/2, self.size.height/2-65);
     
-    /* Make Tap Play First Label and Animation */
-    tapToPlayFirstLabel = [SKSpriteNode spriteNodeWithImageNamed:@"TapToPlaySprite"];
+    /* Make Tap Play First Label */
+    BMGlyphFont *font = [BMGlyphFont fontWithName:@"FontForFlyGuy"];
+    tapToPlayFirstLabel = [BMGlyphLabel labelWithText:@"TAP TO PLAY!" font:font];
     tapToPlayFirstLabel.position = CGPointMake(self.size.width/2, self.size.height/2);
-    tapToPlayFirstLabel.size = CGSizeMake(120, 20);
     [self addChild:tapToPlayFirstLabel];
     
-    /* Make Fuel Tank */
-    fuelTank = [SKSpriteNode spriteNodeWithImageNamed:@"FuelTankSprite"];
-    fuelTank.position = CGPointMake(self.size.width/2/2/2-15, self.size.height/2-80);
-    fuelTank.size = CGSizeMake(40, 10);
-    [self addChild:fuelTank];
+    /* Make Game Over Board */
+    gameOverBoard = [SKSpriteNode spriteNodeWithImageNamed:@"GameOverBoard"];
+    gameOverBoard.position = CGPointMake(self.size.width/2, self.size.height/2+14);
+    gameOverBoard.size = CGSizeMake(140, 120);
     
-    fuelLevel = [SKSpriteNode spriteNodeWithImageNamed:@"FuelFullSprite"];
-    fuelLevel.position = CGPointMake(self.size.width/2/2/2-15, self.size.height/2-80);
-    fuelLevel.size = CGSizeMake(fuel-4, 6);
-    [self addChild:fuelLevel];
+    /* Make New High Score Label */
+    newHighScore = [BMGlyphLabel labelWithText:@"NEW\nHIGH\nSCORE!" font:font2];
+    newHighScore.position = CGPointMake(self.size.width/2+110, self.size.height/2+30);
+    newHighScore.horizontalAlignment = BMGlyphHorizontalAlignmentCentered;
+    //[self addChild:newHighScore];
+
+    /* Make Lives */
+    lifeONE = [SKSpriteNode spriteNodeWithImageNamed:@"heartLifeSprite"];
+    lifeONE.position = CGPointMake(self.size.width/2+145, self.size.height/2-77);
+    lifeONE.size = CGSizeMake(lifeONE.size.width/2-3, lifeONE.size.height/2-3);
+    lifeONE.name = @"lifeONE";
+    
+    lifeTWO = [SKSpriteNode spriteNodeWithImageNamed:@"heartLifeSprite"];
+    lifeTWO.size = CGSizeMake(lifeTWO.size.width/2-3, lifeTWO.size.height/2-3);
+    lifeTWO.position = CGPointMake(self.size.width/2+125, self.size.height/2-77);
+    lifeTWO.name = @"lifeFour";
+    
+    lifeTHREE = [SKSpriteNode spriteNodeWithImageNamed:@"heartLifeSprite"];
+    lifeTHREE.size = CGSizeMake(lifeTHREE.size.width/2-3, lifeTHREE.size.height/2-3);
+    lifeTHREE.position = CGPointMake(self.size.width/2+105, self.size.height/2-77);
+    lifeTHREE.name = @"lifeTHREE";
     
 }
 

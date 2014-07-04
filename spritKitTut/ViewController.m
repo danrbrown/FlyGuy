@@ -7,7 +7,9 @@
 //
 
 #import "ViewController.h"
+
 #import "MyScene.h"
+#import <iAd/iAd.h>
 
 @implementation ViewController
 
@@ -41,9 +43,35 @@
 
 -(BOOL) prefersStatusBarHidden
 {
-    
     return YES;
+}
 
+-(void) bannerViewDidLoadAd:(ADBannerView *)banner
+{
+    
+    [UIView beginAnimations:nil context:nil];
+    [UIView setAnimationDuration:0.5];
+    
+    [banner setAlpha:0];
+    
+    [UIView commitAnimations];
+    
+}
+
+-(void) bannerView:(ADBannerView *)banner didFailToReceiveAdWithError:(NSError *)error
+{
+    
+    [UIView beginAnimations:nil context:nil];
+    [UIView setAnimationDuration:0.5];
+    
+    [banner setAlpha:0];
+    
+    [UIView commitAnimations];
+    
 }
 
 @end
+
+
+
+
