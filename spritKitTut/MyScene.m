@@ -10,6 +10,7 @@
 
 #import "BMGlyphFont.h"
 #import "BMGlyphLabel.h"
+#import "ViewController.h"
 
 static const uint32_t wallCategory       =  0x1 << 2;
 static const uint32_t rockCategory       =  0x1 << 1;
@@ -26,11 +27,12 @@ static const uint32_t playerCategory     =  0x1 << 0;
         self.backgroundColor = [SKColor colorWithRed: 100.0/255.0 green: 200.0/255.0 blue:255.0/255.0 alpha: 1.0];
         
         /* Collision */
-        CGRect frame = CGRectMake(0, -40, self.size.width+30, self.size.height+100);
+        CGRect frame = CGRectMake(0, -30, self.size.width+30, self.size.height+100);
         self.physicsBody = [SKPhysicsBody bodyWithEdgeLoopFromRect:frame];
         self.physicsBody.categoryBitMask = wallCategory;
         self.physicsWorld.contactDelegate = self;
         self.physicsWorld.gravity = CGVectorMake(0,-5);
+        self.physicsBody.restitution = 0.0f;
         
         /* Set Varables */
         moveToX = -30;
@@ -43,17 +45,14 @@ static const uint32_t playerCategory     =  0x1 << 0;
         gameOver = YES;
         unlockedTwo = NO;
         hit = NO;
-        
         NSInteger theHighScore = [[NSUserDefaults standardUserDefaults] integerForKey:@"HighScore"];
         highscore = theHighScore;
   
         /* Exacute */
-        //[self moveBackground];
+        [self moveBackground];
         [self makeGameLabels];
         [self makePlayer];
     
-        
-
     }
     
     return self;
@@ -64,13 +63,6 @@ static const uint32_t playerCategory     =  0x1 << 0;
 
 -(void) addSpritesIn {
     
-    int randomSprite = arc4random() % 6;
-    int randomSpeed = (arc4random()%(5-2))+2;
-    float waitTime = 0.6;
-    int randomPosition = (arc4random()%(320-0)) + 0;
-    
-    [self sendInRockOrFuel:randomSprite atSpeed:randomSpeed waitTime:waitTime atY:randomPosition];
-    
     rockSprite.physicsBody = [SKPhysicsBody bodyWithRectangleOfSize:rockSprite.size];
     rockSprite.physicsBody.dynamic = YES;
     rockSprite.physicsBody.affectedByGravity = NO;
@@ -79,9 +71,15 @@ static const uint32_t playerCategory     =  0x1 << 0;
     rockSprite.physicsBody.collisionBitMask = 0;
     rockSprite.physicsBody.usesPreciseCollisionDetection = YES;
     
+    int randomSpeed = (arc4random()%(5-2))+2;
+    float waitTime = 0.5;
+    int randomPosition = (arc4random()%(320-0)) + 0;
+    
+    [self sendInRockAtSpeed:randomSpeed waitTime:waitTime atY:randomPosition];
+    
 }
 
--(void) sendInRockOrFuel:(int)either atSpeed:(int)speed waitTime:(float)wait atY:(int)y {
+-(void) sendInRockAtSpeed:(int)speed waitTime:(float)wait atY:(int)y {
     
     SKAction *moveObstacle = [SKAction moveToX:moveToX duration:speed];
     rockSprite = [SKSpriteNode spriteNodeWithImageNamed:@"RockSprite"];
@@ -114,6 +112,8 @@ static const uint32_t playerCategory     =  0x1 << 0;
     if (!playing && done)
     {
         
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"hideAd" object:nil];
+        
         fuel = maxFuel;
         score = 0;
         lives = 3;
@@ -132,6 +132,7 @@ static const uint32_t playerCategory     =  0x1 << 0;
         [gameOverBoard removeFromParent];
         [tapToPlayFirstLabel removeFromParent];
         [player removeAllActions];
+        [newHighScore removeFromParent];
         
         SKAction *blinkSequence = [SKAction sequence:@[[SKAction fadeAlphaTo:1.0 duration:0],[SKAction fadeAlphaTo:0.0 duration:0],[SKAction fadeAlphaTo:1.0 duration:0]]];
         
@@ -145,6 +146,8 @@ static const uint32_t playerCategory     =  0x1 << 0;
     }
     else if (playing && !hit)
     {
+        
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"hideAd" object:nil];
         
         [player.physicsBody applyImpulse:CGVectorMake(0.0f, 40.0f)];
         
@@ -165,6 +168,8 @@ static const uint32_t playerCategory     =  0x1 << 0;
 
 -(void) gameOver {
 
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"showAd" object:nil];
+    
     YourScoreWasLabel.text = [NSString stringWithFormat:@"SCORE: %li", (long)score];
     
     NSInteger theHighScore = [[NSUserDefaults standardUserDefaults] integerForKey:@"HighScore"];
@@ -176,6 +181,8 @@ static const uint32_t playerCategory     =  0x1 << 0;
         highscore = score;
         YourHighScoreWasLabel.text = [NSString stringWithFormat:@"BEST: %li", (long)highscore];
         [[NSUserDefaults standardUserDefaults] setInteger:highscore forKey:@"HighScore"];
+        
+        [self addChild:newHighScore];
         
     }
     
@@ -304,7 +311,14 @@ static const uint32_t playerCategory     =  0x1 << 0;
     
 }
 
-#pragma mark Collision between player, rock and wall
+-(void) yourDone {
+    
+    gameOver = NO;
+    [self gameOver];
+    
+}
+
+#pragma mark Collision between player and wall
 
 -(void) collision2:(SKSpriteNode *)playerS didCollideWithRock:(SKSpriteNode *)wallS {
     
@@ -320,14 +334,7 @@ static const uint32_t playerCategory     =  0x1 << 0;
     
 }
 
--(void) yourDone {
-    
-    gameOver = NO;
-    [self gameOver];
-    
-}
-
-#pragma mark Labels
+#pragma mark Make labels
 
 -(void) makeGameLabels {
     
@@ -355,7 +362,7 @@ static const uint32_t playerCategory     =  0x1 << 0;
     
     /* Make Tap Play Again Label */
     tapToPlayLabel = [BMGlyphLabel labelWithText:@"TAP TO PLAY!" font:font2];
-    tapToPlayLabel.position = CGPointMake(self.size.width/2, self.size.height/2-125);
+    tapToPlayLabel.position = CGPointMake(self.size.width/2, self.size.height/2-60);
     
     /* Make Tap Play First Label */
     BMGlyphFont *font = [BMGlyphFont fontWithName:@"FontForFlyGuy"];
@@ -363,16 +370,18 @@ static const uint32_t playerCategory     =  0x1 << 0;
     tapToPlayFirstLabel.position = CGPointMake(self.size.width/2, self.size.height/2);
     [self addChild:tapToPlayFirstLabel];
     
+    /* Make New High Score Label */
+    newHighScore = [BMGlyphLabel labelWithText:@"NEW BEST!" font:font2];
+    newHighScore.position = CGPointMake(self.size.width/2+200, self.size.height/2+100);
+    newHighScore.horizontalAlignment = BMGlyphHorizontalAlignmentCentered;
+    
+    SKAction *rotation = [SKAction rotateByAngle: M_PI/-6.0 duration:0];
+    [newHighScore runAction:rotation];
+    
     /* Make Game Over Board */
     gameOverBoard = [SKSpriteNode spriteNodeWithImageNamed:@"GameOverBoard"];
     gameOverBoard.position = CGPointMake(self.size.width/2, self.size.height/2+14);
     gameOverBoard.size = CGSizeMake(140*2, 120*2);
-    
-    /* Make New High Score Label */
-    newHighScore = [BMGlyphLabel labelWithText:@"NEW\nHIGH\nSCORE!" font:font2];
-    newHighScore.position = CGPointMake(self.size.width/2+110, self.size.height/2+30);
-    newHighScore.horizontalAlignment = BMGlyphHorizontalAlignmentCentered;
-    //[self addChild:newHighScore];
 
     int y = 135;
     int x = 260;
@@ -417,6 +426,7 @@ static const uint32_t playerCategory     =  0x1 << 0;
     player.physicsBody.contactTestBitMask = rockCategory | wallCategory;
     player.physicsBody.allowsRotation = NO;
     player.physicsBody.collisionBitMask = wallCategory;
+    player.physicsBody.restitution = 0.0f;
     
     [self addChild:player];
     
@@ -432,24 +442,15 @@ static const uint32_t playerCategory     =  0x1 << 0;
 
 -(void) moveBackground {
     
-    NSArray *parallaxBackgroundNames = @[@"cloudOne", @"cloudTwo", @"cloudThree", @"cloudOne", @"cloudTwo", @"cloudThree"];
-    CGSize planetSizes = CGSizeMake(50, 50);
-
-    _parallaxNodeBackgrounds = [[FMMParallaxNode alloc] initWithBackgrounds:parallaxBackgroundNames
-                                                                       size:planetSizes
-                                                       pointsPerSecondSpeed:25.0];
-
-    _parallaxNodeBackgrounds.position = CGPointMake(self.size.width/2.0+220, self.size.height/2.0-150);
-
-    [_parallaxNodeBackgrounds randomizeNodesPositions];
-
-    [self addChild:_parallaxNodeBackgrounds];
+    SKSpriteNode *background = [SKSpriteNode spriteNodeWithImageNamed:@"Background"];
+    background.position = CGPointMake(self.size.width/2, self.size.height/2);
+    [self addChild:background];
     
 }
 
 -(void) update:(NSTimeInterval)currentTime {
     
-    [_parallaxNodeBackgrounds update:currentTime];
+
     
 }
 

@@ -25,4 +25,5 @@
 - (SKTexture*) textureFor:(unichar)charId;
 
 + (BMGlyphFont*) fontWithName:(NSString *)name;
+
 @end

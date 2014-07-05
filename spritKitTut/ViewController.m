@@ -34,6 +34,11 @@
     // Present the scene.
     [skView presentScene:scene];
     
+    //Add view controller as observer
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleNotification:) name:@"hideAd" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleNotification:) name:@"showAd" object:nil];
+
+    
 }
 
 -(BOOL) shouldAutorotate
@@ -46,25 +51,53 @@
     return YES;
 }
 
+#pragma mark iAds
+
+-(void) handleNotification:(NSNotification *)notification
+{
+    if ([notification.name isEqualToString:@"hideAd"])
+    {
+        [self hideBanner];
+    }
+    else if ([notification.name isEqualToString:@"showAd"])
+    {
+        [self showBanner];
+    }
+}
+
 -(void) bannerViewDidLoadAd:(ADBannerView *)banner
 {
     
-    [UIView beginAnimations:nil context:nil];
-    [UIView setAnimationDuration:0.5];
-    
-    [banner setAlpha:0];
-    
-    [UIView commitAnimations];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"showAd" object:nil];
     
 }
 
 -(void) bannerView:(ADBannerView *)banner didFailToReceiveAdWithError:(NSError *)error
 {
     
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"hideAd" object:nil];
+    
+}
+
+-(void) showBanner
+{
+    
     [UIView beginAnimations:nil context:nil];
     [UIView setAnimationDuration:0.5];
     
-    [banner setAlpha:0];
+    iAd.frame = CGRectMake(124, 270, iAd.frame.size.width, iAd.frame.size.height);
+    
+    [UIView commitAnimations];
+    
+}
+
+-(void) hideBanner
+{
+    
+    [UIView beginAnimations:nil context:nil];
+    [UIView setAnimationDuration:0.5];
+    
+    iAd.frame = CGRectMake(124, 324, iAd.frame.size.width, iAd.frame.size.height);
     
     [UIView commitAnimations];
     

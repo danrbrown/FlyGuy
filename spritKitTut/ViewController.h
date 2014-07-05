@@ -11,6 +11,12 @@
 #import <SpriteKit/SpriteKit.h>
 #import <iAd/iAd.h>
 
-@interface ViewController : UIViewController <ADBannerViewDelegate>
+@interface ViewController : UIViewController <ADBannerViewDelegate> {
+    
+    IBOutlet ADBannerView *iAd;
+    
+}
+
+-(void) hideBanner;
 
 @end

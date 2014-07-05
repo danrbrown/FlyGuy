@@ -8,7 +8,6 @@
 
 #import <SpriteKit/SpriteKit.h>
 
-#import "FMMParallaxNode.h"
 #import "BMGlyphFont.h"
 #import "BMGlyphLabel.h"
 
@@ -47,9 +46,6 @@
     BOOL done;
     BOOL unlockedTwo;
     BOOL hit;
-    
-    FMMParallaxNode *_parallaxNodeBackgrounds;
-    FMMParallaxNode *_parallaxSpaceDust;
     
 }
 
