@@ -30,6 +30,7 @@
     SKSpriteNode *lifeONE;
     SKSpriteNode *lifeTWO;
     SKSpriteNode *lifeTHREE;
+    SKSpriteNode *lifeEXTRA;
     
     NSInteger score;
     NSInteger highscore;
@@ -58,3 +59,8 @@ typedef enum : uint8_t {
 } JCColliderType;
 
 @end
+
+
+
+
+

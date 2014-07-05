@@ -13,7 +13,7 @@
 
 @implementation ViewController
 
--(void) viewDidLoad
+-(void) viewWillLayoutSubviews
 {
     
     [super viewDidLoad];
@@ -25,7 +25,7 @@
     
     // Create and configure the scene.
     SKScene * scene = [MyScene sceneWithSize:skView.bounds.size];
-    scene.scaleMode = SKSceneScaleModeAspectFill;
+    //scene.scaleMode = SKSceneScaleModeAspectFill;
 
     SKView *spriteView = (SKView *) self.view;
     spriteView.showsNodeCount = NO;

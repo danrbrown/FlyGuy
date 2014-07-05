@@ -11,6 +11,7 @@
 #import "BMGlyphFont.h"
 #import "BMGlyphLabel.h"
 
+static const uint32_t wallCategory       =  0x1 << 2;
 static const uint32_t rockCategory       =  0x1 << 1;
 static const uint32_t playerCategory     =  0x1 << 0;
 
@@ -25,8 +26,9 @@ static const uint32_t playerCategory     =  0x1 << 0;
         self.backgroundColor = [SKColor colorWithRed: 100.0/255.0 green: 200.0/255.0 blue:255.0/255.0 alpha: 1.0];
         
         /* Collision */
-        SKPhysicsBody* borderBody = [SKPhysicsBody bodyWithEdgeLoopFromRect:self.frame];
-        self.physicsBody = borderBody;
+        CGRect frame = CGRectMake(0, -40, self.size.width+30, self.size.height+100);
+        self.physicsBody = [SKPhysicsBody bodyWithEdgeLoopFromRect:frame];
+        self.physicsBody.categoryBitMask = wallCategory;
         self.physicsWorld.contactDelegate = self;
         self.physicsWorld.gravity = CGVectorMake(0,-5);
         
@@ -49,6 +51,8 @@ static const uint32_t playerCategory     =  0x1 << 0;
         //[self moveBackground];
         [self makeGameLabels];
         [self makePlayer];
+    
+        
 
     }
     
@@ -62,9 +66,10 @@ static const uint32_t playerCategory     =  0x1 << 0;
     
     int randomSprite = arc4random() % 6;
     int randomSpeed = (arc4random()%(5-2))+2;
-    float waitTime = 0.8;
+    float waitTime = 0.6;
+    int randomPosition = (arc4random()%(320-0)) + 0;
     
-    [self sendInRockOrFuel:randomSprite atSpeed:randomSpeed waitTime:waitTime];
+    [self sendInRockOrFuel:randomSprite atSpeed:randomSpeed waitTime:waitTime atY:randomPosition];
     
     rockSprite.physicsBody = [SKPhysicsBody bodyWithRectangleOfSize:rockSprite.size];
     rockSprite.physicsBody.dynamic = YES;
@@ -76,30 +81,15 @@ static const uint32_t playerCategory     =  0x1 << 0;
     
 }
 
--(void) sendInRockOrFuel:(int)either atSpeed:(int)speed waitTime:(float)wait {
+-(void) sendInRockOrFuel:(int)either atSpeed:(int)speed waitTime:(float)wait atY:(int)y {
     
     SKAction *moveObstacle = [SKAction moveToX:moveToX duration:speed];
-    int randomPosition = (arc4random()%(340-210)) + 210;
     rockSprite = [SKSpriteNode spriteNodeWithImageNamed:@"RockSprite"];
     
-    if (either == 1 || either == 2 || either == 3)
-    {
-        
-        rockSprite.size = CGSizeMake(25, 15);
-        rockSprite.position = CGPointMake(340, randomPosition);
-        [self addChild:rockSprite];
-        [rockSprite runAction:moveObstacle withKey:@"moveing"];
-        
-    }
-    else if (either == 4 || either == 5)
-    {
-        
-        rockSprite.size = CGSizeMake(35, 22);
-        rockSprite.position = CGPointMake(340, randomPosition);
-        [self addChild:rockSprite];
-        [rockSprite runAction:moveObstacle withKey:@"moveing"];
-
-    }
+    rockSprite.size = CGSizeMake(40, 25);
+    rockSprite.position = CGPointMake(568, y);
+    [self addChild:rockSprite];
+    [rockSprite runAction:moveObstacle withKey:@"moveing"];
     
     [rockSprite runAction:moveObstacle completion:^(void){
        
@@ -156,7 +146,7 @@ static const uint32_t playerCategory     =  0x1 << 0;
     else if (playing && !hit)
     {
         
-        [player.physicsBody applyImpulse:CGVectorMake(0.0f, 10.0f)];
+        [player.physicsBody applyImpulse:CGVectorMake(0.0f, 40.0f)];
         
         [player setTexture:[SKTexture textureWithImageNamed:@"jetPackGuyFly"]];
         
@@ -202,7 +192,7 @@ static const uint32_t playerCategory     =  0x1 << 0;
     playing = NO;
     done = NO;
     
-    [self performSelector:@selector(setPlayer) withObject:self afterDelay:1];
+    [self performSelector:@selector(setPlayer) withObject:self afterDelay:2];
     
 }
 
@@ -233,9 +223,7 @@ static const uint32_t playerCategory     =  0x1 << 0;
             [player runAction:[SKAction repeatActionForever:sequence] withKey:@"flouting"];
             
         }];
-        
-        
-        
+    
     }];
     
 }
@@ -244,57 +232,68 @@ static const uint32_t playerCategory     =  0x1 << 0;
 
 -(void) didBeginContact:(SKPhysicsContact *)contact {
     
-    SKPhysicsBody *firstBody, *secondBody;
+    SKPhysicsBody *firstBody, *secondBody, *thirdBody;
     
     if (contact.bodyA.categoryBitMask < contact.bodyB.categoryBitMask)
     {
         firstBody = contact.bodyA;
         secondBody = contact.bodyB;
+        thirdBody = contact.bodyB;
     }
     else
     {
         firstBody = contact.bodyB;
         secondBody = contact.bodyA;
+        thirdBody = contact.bodyA;
     }
     
     if ((firstBody.categoryBitMask & playerCategory) != 0 && (secondBody.categoryBitMask & rockCategory) != 0)
     {
-        [self collision:(SKSpriteNode *) firstBody.node didCollideWithRock:(SKSpriteNode *) secondBody.node];
+        [self collision1:(SKSpriteNode *) firstBody.node didCollideWithRock:(SKSpriteNode *) secondBody.node];
+    }
+    
+    if ((firstBody.categoryBitMask & playerCategory) != 0 && (thirdBody.categoryBitMask & wallCategory) != 0)
+    {
+        [self collision2:(SKSpriteNode *) firstBody.node didCollideWithRock:(SKSpriteNode *) thirdBody.node];
     }
     
 }
 
-#pragma mark Collision between player and rock
-
--(void) collision:(SKSpriteNode *)playerS didCollideWithRock:(SKSpriteNode *)rockS {
+-(void) anyCollision
+{
     
-    player.alpha = 0.0;
-    SKAction *blinkPlayer = [SKAction sequence:@[[SKAction fadeAlphaTo:1.0 duration:0],[SKAction fadeAlphaTo:0.0 duration:0],[SKAction fadeAlphaTo:1.0 duration:0]]];
-    SKAction *blinkHeart = [SKAction sequence:@[[SKAction fadeAlphaTo:0.0 duration:0],[SKAction fadeAlphaTo:1.0 duration:0],[SKAction fadeAlphaTo:0.0 duration:0]]];
+    if (lives > 0)
+    {
+        
+        player.alpha = 0.0;
+        SKAction *blinkPlayer = [SKAction sequence:@[[SKAction fadeAlphaTo:1.0 duration:0],[SKAction fadeAlphaTo:0.0 duration:0],[SKAction fadeAlphaTo:1.0 duration:0]]];
+        SKAction *blinkHeart = [SKAction sequence:@[[SKAction fadeAlphaTo:0.0 duration:0],[SKAction fadeAlphaTo:1.0 duration:0],[SKAction fadeAlphaTo:0.0 duration:0]]];
+        
+        if (lives == 3)
+        {
+            [lifeTHREE runAction:[SKAction repeatAction:blinkHeart count:5] completion:^{}];
+        }
+        if (lives == 2)
+        {
+            [lifeTWO runAction:[SKAction repeatAction:blinkHeart count:5] completion:^{}];
+        }
+        if (lives == 1)
+        {
+            [lifeONE runAction:[SKAction repeatAction:blinkHeart count:5] completion:^{}];
+        }
+        
+        lives--;
+        
+        [player runAction:[SKAction repeatAction:blinkPlayer count:5] completion:^{}];
+        
+    }
     
-    if (lives == 3)
-    {
-        [lifeTHREE runAction:[SKAction repeatAction:blinkHeart count:5] completion:^{}];
-    }
-    if (lives == 2)
-    {
-        [lifeTWO runAction:[SKAction repeatAction:blinkHeart count:5] completion:^{}];
-    }
-    if (lives == 1)
-    {
-        [lifeONE runAction:[SKAction repeatAction:blinkHeart count:5] completion:^{}];
-    }
-
-    [player runAction:[SKAction repeatAction:blinkPlayer count:5] completion:^{}];
-    
-    lives--;
-
     if (!hit && lives < 1)
     {
         
         hit = YES;
         
-        SKAction *rotation = [SKAction rotateByAngle: M_PI/2.0 duration:0.4];
+        SKAction *rotation = [SKAction rotateByAngle: M_PI/2.0 duration:1];
         SKAction *moveByHit = [SKAction moveToX:player.position.x-10 duration:0.4];
         SKAction *playerWasHit = [SKAction sequence:@[rotation, moveByHit]];
         [player runAction:playerWasHit];
@@ -305,8 +304,23 @@ static const uint32_t playerCategory     =  0x1 << 0;
     
 }
 
--(void) yourDone
-{
+#pragma mark Collision between player, rock and wall
+
+-(void) collision2:(SKSpriteNode *)playerS didCollideWithRock:(SKSpriteNode *)wallS {
+    
+    [self anyCollision];
+    
+}
+
+#pragma mark Collision between player and rock
+
+-(void) collision1:(SKSpriteNode *)playerS didCollideWithRock:(SKSpriteNode *)rockS {
+    
+    [self anyCollision];
+    
+}
+
+-(void) yourDone {
     
     gameOver = NO;
     [self gameOver];
@@ -322,26 +336,26 @@ static const uint32_t playerCategory     =  0x1 << 0;
     /* Make Score Label */
     score = 0;
     scoreLabel = [BMGlyphLabel labelWithText:[NSString stringWithFormat:@"%li", (long)score] font:font2];
-    scoreLabel.position = CGPointMake(self.size.width/2-157, self.size.height/2-77);
+    scoreLabel.position = CGPointMake(self.size.width/2-275, self.size.height/2-137);
     scoreLabel.horizontalAlignment = BMGlyphHorizontalAlignmentLeft;
     
     /* Make Game Over Label */
     GameOverLabel = [BMGlyphLabel labelWithText:@"GAME OVER!" font:font2];
-    GameOverLabel.position = CGPointMake(self.size.width/2, self.size.height/2+43);
+    GameOverLabel.position = CGPointMake(self.size.width/2, self.size.height/2+75);
     
     /* Make After Score Label */
     YourScoreWasLabel = [BMGlyphLabel labelWithText:[NSString stringWithFormat:@"SCORE: %li", (long)score] font:font2];
-    YourScoreWasLabel.position = CGPointMake(self.size.width/2-60, self.size.height/2+13);
+    YourScoreWasLabel.position = CGPointMake(self.size.width/2-110, self.size.height/2+30);
     YourScoreWasLabel.horizontalAlignment = BMGlyphHorizontalAlignmentLeft;
     
     /* Make After Highscore Label */
     YourHighScoreWasLabel = [BMGlyphLabel labelWithText:[NSString stringWithFormat:@"BEST: %li", (long)highscore] font:font2];
-    YourHighScoreWasLabel.position = CGPointMake(self.size.width/2-44.5, self.size.height/2-7);
+    YourHighScoreWasLabel.position = CGPointMake(self.size.width/2-86, self.size.height/2-7);
     YourHighScoreWasLabel.horizontalAlignment = BMGlyphHorizontalAlignmentLeft;
     
     /* Make Tap Play Again Label */
     tapToPlayLabel = [BMGlyphLabel labelWithText:@"TAP TO PLAY!" font:font2];
-    tapToPlayLabel.position = CGPointMake(self.size.width/2, self.size.height/2-65);
+    tapToPlayLabel.position = CGPointMake(self.size.width/2, self.size.height/2-125);
     
     /* Make Tap Play First Label */
     BMGlyphFont *font = [BMGlyphFont fontWithName:@"FontForFlyGuy"];
@@ -352,7 +366,7 @@ static const uint32_t playerCategory     =  0x1 << 0;
     /* Make Game Over Board */
     gameOverBoard = [SKSpriteNode spriteNodeWithImageNamed:@"GameOverBoard"];
     gameOverBoard.position = CGPointMake(self.size.width/2, self.size.height/2+14);
-    gameOverBoard.size = CGSizeMake(140, 120);
+    gameOverBoard.size = CGSizeMake(140*2, 120*2);
     
     /* Make New High Score Label */
     newHighScore = [BMGlyphLabel labelWithText:@"NEW\nHIGH\nSCORE!" font:font2];
@@ -360,24 +374,28 @@ static const uint32_t playerCategory     =  0x1 << 0;
     newHighScore.horizontalAlignment = BMGlyphHorizontalAlignmentCentered;
     //[self addChild:newHighScore];
 
+    int y = 135;
+    int x = 260;
+    int s = 3;
+    
     /* Make Lives */
     lifeONE = [SKSpriteNode spriteNodeWithImageNamed:@"heartLifeSprite"];
-    lifeONE.position = CGPointMake(self.size.width/2+145, self.size.height/2-77);
-    lifeONE.size = CGSizeMake(lifeONE.size.width/2-3, lifeONE.size.height/2-3);
+    lifeONE.position = CGPointMake(self.size.width/2+x, self.size.height/2-y);
+    lifeONE.size = CGSizeMake(lifeONE.size.width-s, lifeONE.size.height-s);
     lifeONE.name = @"lifeONE";
     lifeONE.alpha = 0;
     [self addChild:lifeONE];
     
     lifeTWO = [SKSpriteNode spriteNodeWithImageNamed:@"heartLifeSprite"];
-    lifeTWO.size = CGSizeMake(lifeTWO.size.width/2-3, lifeTWO.size.height/2-3);
-    lifeTWO.position = CGPointMake(self.size.width/2+125, self.size.height/2-77);
+    lifeTWO.size = CGSizeMake(lifeTWO.size.width-s, lifeTWO.size.height-s);
+    lifeTWO.position = CGPointMake(self.size.width/2+x-40, self.size.height/2-y);
     lifeTWO.name = @"lifeFour";
     lifeTWO.alpha = 0;
     [self addChild:lifeTWO];
     
     lifeTHREE = [SKSpriteNode spriteNodeWithImageNamed:@"heartLifeSprite"];
-    lifeTHREE.size = CGSizeMake(lifeTHREE.size.width/2-3, lifeTHREE.size.height/2-3);
-    lifeTHREE.position = CGPointMake(self.size.width/2+105, self.size.height/2-77);
+    lifeTHREE.size = CGSizeMake(lifeTHREE.size.width-s, lifeTHREE.size.height-s);
+    lifeTHREE.position = CGPointMake(self.size.width/2+x-80, self.size.height/2-y);
     lifeTHREE.name = @"lifeTHREE";
     lifeTHREE.alpha = 0;
     [self addChild:lifeTHREE];
@@ -389,14 +407,16 @@ static const uint32_t playerCategory     =  0x1 << 0;
 -(void) makePlayer {
     
     player = [SKSpriteNode spriteNodeWithImageNamed:@"jetPackGuy"];
-    player.position = CGPointMake(40, self.size.height/2);
+    player.position = CGPointMake(60, self.size.height/2);
+    player.size = CGSizeMake(player.size.width*2, player.size.height*2);
 
     player.physicsBody = [SKPhysicsBody bodyWithRectangleOfSize:player.size];
     player.physicsBody.affectedByGravity = NO;
     player.physicsBody.dynamic = YES;
     player.physicsBody.categoryBitMask = playerCategory;
-    player.physicsBody.contactTestBitMask = rockCategory;
-    player.physicsBody.collisionBitMask = 0;
+    player.physicsBody.contactTestBitMask = rockCategory | wallCategory;
+    player.physicsBody.allowsRotation = NO;
+    player.physicsBody.collisionBitMask = wallCategory;
     
     [self addChild:player];
     
@@ -438,8 +458,6 @@ static const uint32_t playerCategory     =  0x1 << 0;
 -(void) didMoveToView:(SKView *)view {
     
 }
-
-
 
 @end
 
