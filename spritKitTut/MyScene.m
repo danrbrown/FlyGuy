@@ -24,14 +24,13 @@ static const uint32_t playerCategory     =  0x1 << 0;
     {
         
         /* Setup scene */
-        self.backgroundColor = [SKColor colorWithRed: 100.0/255.0 green: 200.0/255.0 blue:255.0/255.0 alpha: 1.0];
+        self.backgroundColor = [SKColor whiteColor];
         
         /* Collision */
-        CGRect frame = CGRectMake(0, -30, self.size.width+30, self.size.height+100);
+        CGRect frame = CGRectMake(0, -20, self.size.width+30, self.size.height+100);
         self.physicsBody = [SKPhysicsBody bodyWithEdgeLoopFromRect:frame];
         self.physicsBody.categoryBitMask = wallCategory;
         self.physicsWorld.contactDelegate = self;
-        self.physicsWorld.gravity = CGVectorMake(0,-5);
         self.physicsBody.restitution = 0.0f;
         
         /* Set Varables */
@@ -47,9 +46,35 @@ static const uint32_t playerCategory     =  0x1 << 0;
         hit = NO;
         NSInteger theHighScore = [[NSUserDefaults standardUserDefaults] integerForKey:@"HighScore"];
         highscore = theHighScore;
-  
+
+        
+        /* Move Background */
+        for (int i=0; i<2; i++)
+        {
+            
+            SKSpriteNode *background = [SKSpriteNode spriteNodeWithImageNamed:@"Background"];
+            //background.position = CGPointMake(self.size.width/2, self.size.height/2);
+            background.position = CGPointMake((i*background.size.width)+background.size.width/2, background.size.height/2+20);
+            //background.position = CGPointZero; //In a Mac machine makes the center of the image positioned at lower left corner. Untill and unless specified this is the default position
+            background.name =@"background";
+            [self addChild:background];
+            
+        }
+        
+        for (int i=0; i<2; i++)
+        {
+            
+            SKSpriteNode *ground = [SKSpriteNode spriteNodeWithImageNamed:@"ground"];
+            //background.position = CGPointMake(self.size.width/2, self.size.height/2);
+            ground.position = CGPointMake((i*ground.size.width)+ground.size.width/2, ground.size.height/2+1);
+            ground.size = CGSizeMake(ground.size.width, ground.size.height+2);
+            //background.position = CGPointZero; //In a Mac machine makes the center of the image positioned at lower left corner. Untill and unless specified this is the default position
+            ground.name =@"ground";
+            [self addChild:ground];
+            
+        }
+        
         /* Exacute */
-        [self moveBackground];
         [self makeGameLabels];
         [self makePlayer];
     
@@ -59,7 +84,7 @@ static const uint32_t playerCategory     =  0x1 << 0;
 
 }
 
-#pragma mark Send them coins in
+#pragma mark Send them rocks in
 
 -(void) addSpritesIn {
     
@@ -72,7 +97,7 @@ static const uint32_t playerCategory     =  0x1 << 0;
     rockSprite.physicsBody.usesPreciseCollisionDetection = YES;
     
     int randomSpeed = (arc4random()%(5-2))+2;
-    float waitTime = 0.5;
+    float waitTime = 0.85;
     int randomPosition = (arc4random()%(320-0)) + 0;
     
     [self sendInRockAtSpeed:randomSpeed waitTime:waitTime atY:randomPosition];
@@ -84,7 +109,7 @@ static const uint32_t playerCategory     =  0x1 << 0;
     SKAction *moveObstacle = [SKAction moveToX:moveToX duration:speed];
     rockSprite = [SKSpriteNode spriteNodeWithImageNamed:@"RockSprite"];
     
-    rockSprite.size = CGSizeMake(40, 25);
+    rockSprite.size = CGSizeMake(40*3/2-5, 25*3/2-5);
     rockSprite.position = CGPointMake(568, y);
     [self addChild:rockSprite];
     [rockSprite runAction:moveObstacle withKey:@"moveing"];
@@ -149,7 +174,7 @@ static const uint32_t playerCategory     =  0x1 << 0;
         
         [[NSNotificationCenter defaultCenter] postNotificationName:@"hideAd" object:nil];
         
-        [player.physicsBody applyImpulse:CGVectorMake(0.0f, 40.0f)];
+        [player.physicsBody applyImpulse:CGVectorMake(0.0f, 90.0f)];
         
         [player setTexture:[SKTexture textureWithImageNamed:@"jetPackGuyFly"]];
         
@@ -192,7 +217,6 @@ static const uint32_t playerCategory     =  0x1 << 0;
     [self addChild:gameOverBoard];
     [self addChild:GameOverLabel];
     [self addChild:YourScoreWasLabel];
-    [self addChild:tapToPlayLabel];
     [self addChild:YourHighScoreWasLabel];
     
     gameOver = NO;
@@ -212,12 +236,10 @@ static const uint32_t playerCategory     =  0x1 << 0;
     
     [player runAction:moveEm completion:^(void){
         
-        SKAction *rotation = [SKAction rotateByAngle: M_PI/-4.0 duration:0.7];
-        SKAction *moveFix = [SKAction moveToX:player.position.x+10 duration:0.7];
-        SKAction *playerWasFixed = [SKAction sequence:@[rotation, moveFix]];
-        [player runAction:playerWasFixed];
+        SKAction *rotation = [SKAction rotateByAngle: M_PI/-4.0 duration:0.4];
+        [player runAction:rotation];
         
-        [player runAction:playerWasFixed completion:^(void){
+        [player runAction:rotation completion:^(void){
             
             done = YES;
             gameOver = NO;
@@ -229,6 +251,8 @@ static const uint32_t playerCategory     =  0x1 << 0;
             SKAction *sequence = [SKAction sequence:@[a,b]];
             [player runAction:[SKAction repeatActionForever:sequence] withKey:@"flouting"];
             
+            [self addChild:tapToPlayLabel];
+            
         }];
     
     }];
@@ -239,29 +263,22 @@ static const uint32_t playerCategory     =  0x1 << 0;
 
 -(void) didBeginContact:(SKPhysicsContact *)contact {
     
-    SKPhysicsBody *firstBody, *secondBody, *thirdBody;
+    SKPhysicsBody *firstBody, *secondBody;
     
     if (contact.bodyA.categoryBitMask < contact.bodyB.categoryBitMask)
     {
         firstBody = contact.bodyA;
         secondBody = contact.bodyB;
-        thirdBody = contact.bodyB;
     }
     else
     {
         firstBody = contact.bodyB;
         secondBody = contact.bodyA;
-        thirdBody = contact.bodyA;
     }
     
     if ((firstBody.categoryBitMask & playerCategory) != 0 && (secondBody.categoryBitMask & rockCategory) != 0)
     {
         [self collision1:(SKSpriteNode *) firstBody.node didCollideWithRock:(SKSpriteNode *) secondBody.node];
-    }
-    
-    if ((firstBody.categoryBitMask & playerCategory) != 0 && (thirdBody.categoryBitMask & wallCategory) != 0)
-    {
-        [self collision2:(SKSpriteNode *) firstBody.node didCollideWithRock:(SKSpriteNode *) thirdBody.node];
     }
     
 }
@@ -301,9 +318,7 @@ static const uint32_t playerCategory     =  0x1 << 0;
         hit = YES;
         
         SKAction *rotation = [SKAction rotateByAngle: M_PI/2.0 duration:1];
-        SKAction *moveByHit = [SKAction moveToX:player.position.x-10 duration:0.4];
-        SKAction *playerWasHit = [SKAction sequence:@[rotation, moveByHit]];
-        [player runAction:playerWasHit];
+        [player runAction:rotation];
         
         [self performSelector:@selector(yourDone) withObject:self afterDelay:0.2];
         
@@ -315,14 +330,6 @@ static const uint32_t playerCategory     =  0x1 << 0;
     
     gameOver = NO;
     [self gameOver];
-    
-}
-
-#pragma mark Collision between player and wall
-
--(void) collision2:(SKSpriteNode *)playerS didCollideWithRock:(SKSpriteNode *)wallS {
-    
-    [self anyCollision];
     
 }
 
@@ -361,7 +368,8 @@ static const uint32_t playerCategory     =  0x1 << 0;
     YourHighScoreWasLabel.horizontalAlignment = BMGlyphHorizontalAlignmentLeft;
     
     /* Make Tap Play Again Label */
-    tapToPlayLabel = [BMGlyphLabel labelWithText:@"TAP TO PLAY!" font:font2];
+    BMGlyphFont *font3 = [BMGlyphFont fontWithName:@"FontForFlyGuy3"];
+    tapToPlayLabel = [BMGlyphLabel labelWithText:@"TAP TO PLAY!" font:font3];
     tapToPlayLabel.position = CGPointMake(self.size.width/2, self.size.height/2-60);
     
     /* Make Tap Play First Label */
@@ -389,7 +397,7 @@ static const uint32_t playerCategory     =  0x1 << 0;
     
     /* Make Lives */
     lifeONE = [SKSpriteNode spriteNodeWithImageNamed:@"heartLifeSprite"];
-    lifeONE.position = CGPointMake(self.size.width/2+x, self.size.height/2-y);
+    lifeONE.position = CGPointMake(self.size.width/2-x, self.size.height/2+y);
     lifeONE.size = CGSizeMake(lifeONE.size.width-s, lifeONE.size.height-s);
     lifeONE.name = @"lifeONE";
     lifeONE.alpha = 0;
@@ -397,14 +405,14 @@ static const uint32_t playerCategory     =  0x1 << 0;
     
     lifeTWO = [SKSpriteNode spriteNodeWithImageNamed:@"heartLifeSprite"];
     lifeTWO.size = CGSizeMake(lifeTWO.size.width-s, lifeTWO.size.height-s);
-    lifeTWO.position = CGPointMake(self.size.width/2+x-40, self.size.height/2-y);
+    lifeTWO.position = CGPointMake(self.size.width/2-x+40, self.size.height/2+y);
     lifeTWO.name = @"lifeFour";
     lifeTWO.alpha = 0;
     [self addChild:lifeTWO];
     
     lifeTHREE = [SKSpriteNode spriteNodeWithImageNamed:@"heartLifeSprite"];
     lifeTHREE.size = CGSizeMake(lifeTHREE.size.width-s, lifeTHREE.size.height-s);
-    lifeTHREE.position = CGPointMake(self.size.width/2+x-80, self.size.height/2-y);
+    lifeTHREE.position = CGPointMake(self.size.width/2-x+80, self.size.height/2+y);
     lifeTHREE.name = @"lifeTHREE";
     lifeTHREE.alpha = 0;
     [self addChild:lifeTHREE];
@@ -442,15 +450,57 @@ static const uint32_t playerCategory     =  0x1 << 0;
 
 -(void) moveBackground {
     
-    SKSpriteNode *background = [SKSpriteNode spriteNodeWithImageNamed:@"Background"];
-    background.position = CGPointMake(self.size.width/2, self.size.height/2);
-    [self addChild:background];
+    [self enumerateChildNodesWithName:@"background" usingBlock:^(SKNode *node, BOOL *stop) {
+        
+        SKSpriteNode *bg  = (SKSpriteNode *)node;
+        CGPoint bgVelocity = CGPointMake(-10.0, 0);
+        CGPoint amountToMove = CGPointMultiplyScalar (bgVelocity,_dt);
+        bg.position = CGPointAdd(bg.position,amountToMove);
+        
+        if (bg.position.x <= -bg.size.width/2)
+        {
+            bg.position = CGPointMake(bg.position.x + (bg.size.width)*2, bg.position.y);
+        }
     
+    }];
+    
+    [self enumerateChildNodesWithName:@"ground" usingBlock:^(SKNode *node, BOOL *stop) {
+        
+        SKSpriteNode *bg  = (SKSpriteNode *)node;
+        CGPoint bgVelocity = CGPointMake(-70.0, 0);
+        CGPoint amountToMove = CGPointMultiplyScalar (bgVelocity,_dt);
+        bg.position = CGPointAdd(bg.position,amountToMove);
+        
+        if (bg.position.x <= -bg.size.width/2)
+        {
+            bg.position = CGPointMake(bg.position.x + (bg.size.width)*2, bg.position.y);
+        }
+        
+    }];
+    
+}
+
+CGPoint CGPointAdd(CGPoint p1, CGPoint p2) {
+    return CGPointMake(p1.x + p2.x, p1.y + p2.y);
+}
+
+CGPoint CGPointMultiplyScalar(CGPoint p1, CGFloat p2) {
+    return CGPointMake(p1.x *p2, p1.y*p2);
 }
 
 -(void) update:(NSTimeInterval)currentTime {
     
-
+    if(_lastUpdateTime)
+    {
+        _dt = currentTime - _lastUpdateTime;
+    }
+    else
+    {
+        _dt=0;
+    }
+    
+    _lastUpdateTime = currentTime;
+    [self moveBackground];
     
 }
 

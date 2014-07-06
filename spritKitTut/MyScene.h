@@ -17,6 +17,12 @@
     SKSpriteNode *rockSprite;
     SKSpriteNode *timesTwoSprite;
     
+    SKSpriteNode *gameOverBoard;
+    SKSpriteNode *lifeONE;
+    SKSpriteNode *lifeTWO;
+    SKSpriteNode *lifeTHREE;
+    SKSpriteNode *lifeEXTRA;
+    
     BMGlyphLabel *scoreLabel;
     BMGlyphLabel *GameOverLabel;
     BMGlyphLabel *YourScoreWasLabel;
@@ -25,27 +31,25 @@
     BMGlyphLabel *tapToPlayLabel;
     BMGlyphLabel *newHighScore;
     
-    SKSpriteNode *gameOverBoard;
-    SKSpriteNode *lifeONE;
-    SKSpriteNode *lifeTWO;
-    SKSpriteNode *lifeTHREE;
-    SKSpriteNode *lifeEXTRA;
-    
-    NSInteger score;
-    NSInteger highscore;
-    
     int moveToX;
     int fuel;
     int maxFuel;
     int halfFuel;
     int almostDoneFuel;
     int lives;
+    
+    NSInteger score;
+    NSInteger highscore;
 
     BOOL gameOver;
     BOOL playing;
     BOOL done;
     BOOL unlockedTwo;
     BOOL hit;
+    
+    NSTimeInterval _lastUpdateTime;
+    NSTimeInterval _dt;
+    CGPoint _velocity;
     
 }
 

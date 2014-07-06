@@ -23,7 +23,10 @@
 		9C1B7758193CF67A00977B60 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9C1B7733193CF67A00977B60 /* UIKit.framework */; };
 		9C1B7760193CF67A00977B60 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 9C1B775E193CF67A00977B60 /* InfoPlist.strings */; };
 		9C1B7762193CF67A00977B60 /* spritKitTutTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C1B7761193CF67A00977B60 /* spritKitTutTests.m */; };
-		9C9D63E31968C42600EF8C88 /* Background.png in Resources */ = {isa = PBXBuildFile; fileRef = 9C9D63E21968C42600EF8C88 /* Background.png */; };
+		9C9D63E61968C64000EF8C88 /* FontForFlyGuy3.atlas in Resources */ = {isa = PBXBuildFile; fileRef = 9C9D63E41968C64000EF8C88 /* FontForFlyGuy3.atlas */; };
+		9C9D63E71968C64000EF8C88 /* FontForFlyGuy3@2x.xml in Resources */ = {isa = PBXBuildFile; fileRef = 9C9D63E51968C64000EF8C88 /* FontForFlyGuy3@2x.xml */; };
+		9C9D63EA1968CC6A00EF8C88 /* Background.png in Resources */ = {isa = PBXBuildFile; fileRef = 9C9D63E81968CC6A00EF8C88 /* Background.png */; };
+		9C9D63EB1968CC6A00EF8C88 /* ground.png in Resources */ = {isa = PBXBuildFile; fileRef = 9C9D63E91968CC6A00EF8C88 /* ground.png */; };
 		9CC424471964AFF000F6C79B /* BMGlyphFont.m in Sources */ = {isa = PBXBuildFile; fileRef = 9CC424441964AFF000F6C79B /* BMGlyphFont.m */; };
 		9CC424481964AFF000F6C79B /* BMGlyphLabel.m in Sources */ = {isa = PBXBuildFile; fileRef = 9CC424461964AFF000F6C79B /* BMGlyphLabel.m */; };
 		9CC424541964D2B500F6C79B /* GameOverBoard.png in Resources */ = {isa = PBXBuildFile; fileRef = 9CC424531964D2B500F6C79B /* GameOverBoard.png */; };
@@ -72,7 +75,10 @@
 		9C1B775D193CF67A00977B60 /* spritKitTutTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "spritKitTutTests-Info.plist"; sourceTree = "<group>"; };
 		9C1B775F193CF67A00977B60 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		9C1B7761193CF67A00977B60 /* spritKitTutTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = spritKitTutTests.m; sourceTree = "<group>"; };
-		9C9D63E21968C42600EF8C88 /* Background.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Background.png; sourceTree = "<group>"; };
+		9C9D63E41968C64000EF8C88 /* FontForFlyGuy3.atlas */ = {isa = PBXFileReference; lastKnownFileType = folder.skatlas; path = FontForFlyGuy3.atlas; sourceTree = "<group>"; };
+		9C9D63E51968C64000EF8C88 /* FontForFlyGuy3@2x.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = "FontForFlyGuy3@2x.xml"; sourceTree = "<group>"; };
+		9C9D63E81968CC6A00EF8C88 /* Background.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Background.png; sourceTree = "<group>"; };
+		9C9D63E91968CC6A00EF8C88 /* ground.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = ground.png; sourceTree = "<group>"; };
 		9CC424431964AFF000F6C79B /* BMGlyphFont.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BMGlyphFont.h; sourceTree = "<group>"; };
 		9CC424441964AFF000F6C79B /* BMGlyphFont.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BMGlyphFont.m; sourceTree = "<group>"; };
 		9CC424451964AFF000F6C79B /* BMGlyphLabel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BMGlyphLabel.h; sourceTree = "<group>"; };
@@ -206,6 +212,8 @@
 				9CC424561964EA4300F6C79B /* FontForFlyGuy@2x.xml */,
 				9CC424591964EB1500F6C79B /* FontForFlyGuy2.atlas */,
 				9CC4245A1964EB1500F6C79B /* FontForFlyGuy2@2x.xml */,
+				9C9D63E41968C64000EF8C88 /* FontForFlyGuy3.atlas */,
+				9C9D63E51968C64000EF8C88 /* FontForFlyGuy3@2x.xml */,
 			);
 			path = KeyDocs;
 			sourceTree = "<group>";
@@ -213,7 +221,8 @@
 		9CD0FC191954BE38007C3B00 /* Images */ = {
 			isa = PBXGroup;
 			children = (
-				9C9D63E21968C42600EF8C88 /* Background.png */,
+				9C9D63E81968CC6A00EF8C88 /* Background.png */,
+				9C9D63E91968CC6A00EF8C88 /* ground.png */,
 				9CC4245F1967189100F6C79B /* heartLifeSprite.png */,
 				9CC424531964D2B500F6C79B /* GameOverBoard.png */,
 				A56A55AE1960C42B007DBBFA /* timesTwoSprite.png */,
@@ -302,19 +311,22 @@
 			buildActionMask = 2147483647;
 			files = (
 				A5FE630D195B7037000CC93A /* jetPackGuy.png in Resources */,
+				9C9D63EA1968CC6A00EF8C88 /* Background.png in Resources */,
 				9CC4245C1964EB1500F6C79B /* FontForFlyGuy2@2x.xml in Resources */,
 				9CC424601967189100F6C79B /* heartLifeSprite.png in Resources */,
-				9C9D63E31968C42600EF8C88 /* Background.png in Resources */,
 				9CC424571964EA4300F6C79B /* FontForFlyGuy.atlas in Resources */,
+				9C9D63EB1968CC6A00EF8C88 /* ground.png in Resources */,
 				9C1B773C193CF67A00977B60 /* InfoPlist.strings in Resources */,
 				A5FE630E195B7037000CC93A /* jetPackGuyFly.png in Resources */,
 				9C1B774F193CF67A00977B60 /* Images.xcassets in Resources */,
 				9CC4245B1964EB1500F6C79B /* FontForFlyGuy2.atlas in Resources */,
 				9C1B7745193CF67A00977B60 /* Main.storyboard in Resources */,
 				9CC424581964EA4300F6C79B /* FontForFlyGuy@2x.xml in Resources */,
+				9C9D63E61968C64000EF8C88 /* FontForFlyGuy3.atlas in Resources */,
 				A56A55AF1960C42B007DBBFA /* timesTwoSprite.png in Resources */,
 				9CC424541964D2B500F6C79B /* GameOverBoard.png in Resources */,
 				A5FE6312195BAB23000CC93A /* RockSprite.png in Resources */,
+				9C9D63E71968C64000EF8C88 /* FontForFlyGuy3@2x.xml in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
