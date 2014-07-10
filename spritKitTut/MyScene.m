@@ -12,6 +12,7 @@
 #import "BMGlyphLabel.h"
 #import "ViewController.h"
 #import "Twitter/Twitter.h"
+#import "AppDelegate.h"
 
 int shareScore;
 
@@ -89,6 +90,7 @@ static const uint32_t playerCategory     =  0x1 << 0;
 
 -(void) addSpritesIn {
     
+    rockSprite = [SKSpriteNode spriteNodeWithImageNamed:@"RockSprite"];
     rockSprite.physicsBody = [SKPhysicsBody bodyWithRectangleOfSize:rockSprite.size];
     rockSprite.physicsBody.dynamic = YES;
     rockSprite.physicsBody.affectedByGravity = NO;
@@ -98,7 +100,7 @@ static const uint32_t playerCategory     =  0x1 << 0;
     rockSprite.physicsBody.usesPreciseCollisionDetection = YES;
     
     int randomSpeed = (arc4random()%(5-2))+2;
-    float waitTime = 0.7;
+    float waitTime;
     int randomPosition;
     
     if (player.position.y > 15 && player.position.y < 18)
@@ -110,6 +112,27 @@ static const uint32_t playerCategory     =  0x1 << 0;
         randomPosition = (arc4random()%(325)) + 0;
     }
     
+    if (score > 50 && score < 100)
+    {
+        waitTime = 0.6;
+    }
+    else if (score > 100 && score < 200)
+    {
+        waitTime = 0.5;
+    }
+    else if (score > 200 && score < 300)
+    {
+        waitTime = 0.4;
+    }
+    else if (waitTime > 300)
+    {
+        waitTime = 0.3;
+    }
+    else
+    {
+        waitTime = 0.7;
+    }
+    
     [self sendInRockAtSpeed:randomSpeed waitTime:waitTime atY:randomPosition];
     
 }
@@ -118,7 +141,7 @@ static const uint32_t playerCategory     =  0x1 << 0;
     
     SKAction *moveObstacle = [SKAction moveToX:moveToX duration:speed];
     
-    rockSprite = [SKSpriteNode spriteNodeWithImageNamed:@"RockSprite"];
+    //rockSprite = [SKSpriteNode spriteNodeWithImageNamed:@"RockSprite"];
     rockSprite.size = CGSizeMake(40*3/2-5, 25*3/2-5);
     rockSprite.position = CGPointMake(568, y);
 
@@ -387,7 +410,16 @@ static const uint32_t playerCategory     =  0x1 << 0;
 {
     
     shareSprite = [SKSpriteNode spriteNodeWithImageNamed:@"shareButton"];
-    shareSprite.position = CGPointMake(self.size.width/2+230, self.size.height/2-135);
+    
+    if ((APP).screenIsSmall)
+    {
+        shareSprite.position = CGPointMake(self.size.width/2+188, self.size.height/2-80);
+    }
+    else
+    {
+        shareSprite.position = CGPointMake(self.size.width/2+230, self.size.height/2-135);
+    }
+    
     shareSprite.name = @"share";
     return shareSprite;
     
@@ -397,12 +429,15 @@ static const uint32_t playerCategory     =  0x1 << 0;
 
 -(void) makeGameLabels {
     
+    int y = 135;
+    int x;
+    int s = 3;
+    
     BMGlyphFont *font2 = [BMGlyphFont fontWithName:@"FontForFlyGuy2"];
     
     /* Make Score Label */
     score = 0;
     scoreLabel = [BMGlyphLabel labelWithText:[NSString stringWithFormat:@"%li", (long)score] font:font2];
-    scoreLabel.position = CGPointMake(self.size.width/2-275, self.size.height/2-137);
     scoreLabel.horizontalAlignment = BMGlyphHorizontalAlignmentLeft;
     
     /* Make Game Over Label */
@@ -442,10 +477,17 @@ static const uint32_t playerCategory     =  0x1 << 0;
     gameOverBoard = [SKSpriteNode spriteNodeWithImageNamed:@"GameOverBoard"];
     gameOverBoard.position = CGPointMake(self.size.width/2, self.size.height/2+14);
     gameOverBoard.size = CGSizeMake(140*2, 120*2);
-
-    int y = 135;
-    int x = 260;
-    int s = 3;
+    
+    if ((APP).screenIsSmall)
+    {
+        x = 220;
+        scoreLabel.position = CGPointMake(self.size.width/2-230, self.size.height/2-137);
+    }
+    else
+    {
+        x = 260;
+        scoreLabel.position = CGPointMake(self.size.width/2-275, self.size.height/2-137);
+    }
     
     /* Make Lives */
     lifeONE = [SKSpriteNode spriteNodeWithImageNamed:@"heartLifeSprite"];
@@ -465,7 +507,7 @@ static const uint32_t playerCategory     =  0x1 << 0;
     lifeTHREE.position = CGPointMake(self.size.width/2-x+80, self.size.height/2+y);
     lifeTHREE.alpha = 0;
     [self addChild:lifeTHREE];
-    
+
 }
 
 #pragma mark Make player

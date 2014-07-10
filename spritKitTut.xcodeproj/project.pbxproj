@@ -50,7 +50,7 @@
 		9CC4245E1966067300F6C79B /* iAd.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9CC4245D1966067300F6C79B /* iAd.framework */; };
 		9CD22C6B196DC8A4006EBF99 /* shareButton.png in Resources */ = {isa = PBXBuildFile; fileRef = 9CD22C6A196DC8A4006EBF99 /* shareButton.png */; };
 		9CD22C6D196E2DF5006EBF99 /* MessageUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9CD22C6C196E2DF5006EBF99 /* MessageUI.framework */; };
-		9CD22C71196E31A9006EBF99 /* TheIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 9CD22C70196E31A9006EBF99 /* TheIcon.png */; };
+		9CD22C75196F36E7006EBF99 /* TheIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 9CD22C74196F36E7006EBF99 /* TheIcon.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -115,7 +115,7 @@
 		9CC4245D1966067300F6C79B /* iAd.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = iAd.framework; path = System/Library/Frameworks/iAd.framework; sourceTree = SDKROOT; };
 		9CD22C6A196DC8A4006EBF99 /* shareButton.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = shareButton.png; sourceTree = "<group>"; };
 		9CD22C6C196E2DF5006EBF99 /* MessageUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MessageUI.framework; path = System/Library/Frameworks/MessageUI.framework; sourceTree = SDKROOT; };
-		9CD22C70196E31A9006EBF99 /* TheIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = TheIcon.png; path = Documents/TheIcon.png; sourceTree = "<group>"; };
+		9CD22C74196F36E7006EBF99 /* TheIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = TheIcon.png; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -235,7 +235,7 @@
 			isa = PBXGroup;
 			children = (
 				9C9D63F9196A3B1C00EF8C88 /* Documents */,
-				9CD22C70196E31A9006EBF99 /* TheIcon.png */,
+				9CD22C74196F36E7006EBF99 /* TheIcon.png */,
 				9C9D63F8196A3B1C00EF8C88 /* Background.png */,
 				9C9D6406196A3B1C00EF8C88 /* GameOverBoard.png */,
 				9C9D6407196A3B1C00EF8C88 /* ground.png */,
@@ -352,7 +352,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9CD22C71196E31A9006EBF99 /* TheIcon.png in Resources */,
+				9CD22C75196F36E7006EBF99 /* TheIcon.png in Resources */,
 				9C9D640E196A3B1C00EF8C88 /* BackgroundDoc.psd in Resources */,
 				9C9D641C196A3B1C00EF8C88 /* heartLifeSprite.png in Resources */,
 				9C9D6415196A3B1C00EF8C88 /* heartLifeDoc.psd in Resources */,

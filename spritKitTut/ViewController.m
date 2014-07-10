@@ -9,9 +9,11 @@
 #import "ViewController.h"
 
 #import "MyScene.h"
+#import "Twitter/Twitter.h"
+#import "AppDelegate.h"
 #import <iAd/iAd.h>
 #import <MessageUI/MessageUI.h>
-#import "Twitter/Twitter.h"
+
 
 @implementation ViewController
 
@@ -100,7 +102,18 @@
     [UIView beginAnimations:nil context:nil];
     [UIView setAnimationDuration:0.2];
     
-    iAd.frame = CGRectMake(124, 270, iAd.frame.size.width, iAd.frame.size.height);
+    if ((APP).screenIsSmall)
+    {
+        
+        iAd.frame = CGRectMake(80, 270, iAd.frame.size.width, iAd.frame.size.height);
+        
+    }
+    else
+    {
+        
+        iAd.frame = CGRectMake(124, 270, iAd.frame.size.width, iAd.frame.size.height);
+        
+    }
     
     [UIView commitAnimations];
     

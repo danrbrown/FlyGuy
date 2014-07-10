@@ -15,7 +15,22 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     // Override point for customization after application launch.
-    [MPMoviePlayerController preparePrerollAds];
+
+    CGSize result = [[UIScreen mainScreen] bounds].size;
+    if(result.height == 480)
+    {
+        
+        _screenIsSmall = YES;
+        
+    }
+    
+    if(result.height == 568)
+    {
+    
+        _screenIsSmall = NO;
+        
+    }
+    
     return YES;
 }
 							
