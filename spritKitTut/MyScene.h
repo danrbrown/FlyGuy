@@ -11,6 +11,8 @@
 #import "BMGlyphFont.h"
 #import "BMGlyphLabel.h"
 
+extern int shareScore;
+
 @interface MyScene : SKScene <SKPhysicsContactDelegate> {
     
     SKSpriteNode *player;
@@ -22,6 +24,8 @@
     SKSpriteNode *lifeTWO;
     SKSpriteNode *lifeTHREE;
     SKSpriteNode *lifeEXTRA;
+    
+    SKSpriteNode *shareSprite;
     
     BMGlyphLabel *scoreLabel;
     BMGlyphLabel *GameOverLabel;
@@ -41,15 +45,14 @@
     NSInteger score;
     NSInteger highscore;
 
-    BOOL gameOver;
-    BOOL playing;
-    BOOL done;
-    BOOL unlockedTwo;
-    BOOL hit;
-    
     NSTimeInterval _lastUpdateTime;
     NSTimeInterval _dt;
     CGPoint _velocity;
+    
+    BOOL gameOver;
+    BOOL playing;
+    BOOL done;
+    BOOL hit;
     
 }
 

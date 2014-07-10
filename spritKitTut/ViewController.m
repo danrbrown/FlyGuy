@@ -10,6 +10,8 @@
 
 #import "MyScene.h"
 #import <iAd/iAd.h>
+#import <MessageUI/MessageUI.h>
+#import "Twitter/Twitter.h"
 
 @implementation ViewController
 
@@ -25,7 +27,7 @@
     
     // Create and configure the scene.
     SKScene * scene = [MyScene sceneWithSize:skView.bounds.size];
-    //scene.scaleMode = SKSceneScaleModeAspectFill;
+    scene.scaleMode = SKSceneScaleModeAspectFill;
 
     SKView *spriteView = (SKView *) self.view;
     spriteView.showsNodeCount = NO;
@@ -37,7 +39,11 @@
     //Add view controller as observer
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleNotification:) name:@"hideAd" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleNotification:) name:@"showAd" object:nil];
-
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleNotification:) name:@"shareIt" object:nil];
+    
+    shareString = [NSString stringWithFormat:@"I just got %i on [app name]! Beat that!", shareScore];
+    
     
 }
 
@@ -53,18 +59,6 @@
 
 #pragma mark iAds
 
--(void) handleNotification:(NSNotification *)notification
-{
-    if ([notification.name isEqualToString:@"hideAd"])
-    {
-        [self hideBanner];
-    }
-    else if ([notification.name isEqualToString:@"showAd"])
-    {
-        [self showBanner];
-    }
-}
-
 -(void) bannerViewDidLoadAd:(ADBannerView *)banner
 {
     
@@ -79,11 +73,32 @@
     
 }
 
+-(void) handleNotification:(NSNotification *)notification
+{
+    if ([notification.name isEqualToString:@"hideAd"])
+    {
+        [self hideBanner];
+    }
+    else if ([notification.name isEqualToString:@"showAd"])
+    {
+        [self showBanner];
+    }
+    else if ([notification.name isEqualToString:@"shareIt"])
+    {
+        
+        UIAlertView *popUp = [[UIAlertView alloc] initWithTitle:@"Share via..." message:nil delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Facebook", @"Twitter", @"iMessage", @"Email", @"Rate this app", nil];
+        
+        [popUp show];
+        
+    }
+    
+}
+
 -(void) showBanner
 {
     
     [UIView beginAnimations:nil context:nil];
-    [UIView setAnimationDuration:0.5];
+    [UIView setAnimationDuration:0.2];
     
     iAd.frame = CGRectMake(124, 270, iAd.frame.size.width, iAd.frame.size.height);
     
@@ -95,13 +110,131 @@
 {
     
     [UIView beginAnimations:nil context:nil];
-    [UIView setAnimationDuration:0.5];
+    [UIView setAnimationDuration:0.2];
     
     iAd.frame = CGRectMake(124, 324, iAd.frame.size.width, iAd.frame.size.height);
     
     [UIView commitAnimations];
     
 }
+
+#pragma mark Share app
+
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+   
+    if (buttonIndex == 1)
+    {
+        [self postScore];
+    }
+    else if (buttonIndex == 2)
+    {
+        [self tweetScore];
+    }
+    else if (buttonIndex == 3)
+    {
+        [self sendTheText];
+    }
+    else if (buttonIndex == 4)
+    {
+        [self sendTheEmail];
+    }
+    else if (buttonIndex == 5)
+    {
+        [self rateThisApp];
+    }
+    
+}
+
+-(void) postScore
+{
+    
+    SLComposeViewController *post = [[SLComposeViewController alloc] init];
+    
+    post = [SLComposeViewController composeViewControllerForServiceType:SLServiceTypeFacebook];
+    [post addImage:[UIImage imageNamed:@"TheIcon"]];
+    [post setInitialText:shareString];
+    
+    [self presentViewController:post animated:YES completion:nil];
+    
+}
+
+-(void) tweetScore
+{
+    
+    SLComposeViewController *tweet = [[SLComposeViewController alloc] init];
+    
+    tweet= [SLComposeViewController composeViewControllerForServiceType:SLServiceTypeTwitter];
+    [tweet addImage:[UIImage imageNamed:@"TheIcon"]];
+    [tweet setInitialText:shareString];
+    
+    [self presentViewController:tweet animated:YES completion:nil];
+    
+}
+
+-(void) sendTheText
+{
+    
+    MFMessageComposeViewController *textMessage = [[MFMessageComposeViewController alloc] init];
+    
+    [textMessage setMessageComposeDelegate:self];
+    
+    if ([MFMessageComposeViewController canSendText])
+    {
+        
+        [textMessage setBody:shareString];
+        
+        [self presentViewController:textMessage animated:YES completion:nil];
+        
+    }
+    
+}
+
+-(void) messageComposeViewController:(MFMessageComposeViewController *)controller didFinishWithResult:(MessageComposeResult)result
+{
+    
+    [self dismissViewControllerAnimated:YES completion:nil];
+    
+}
+
+-(void) sendTheEmail
+{
+    
+    MFMailComposeViewController *mailComposer = [[MFMailComposeViewController alloc] init];
+    
+    [mailComposer setMailComposeDelegate:self];
+    
+    if ([MFMailComposeViewController canSendMail])
+    {
+        
+        [mailComposer setSubject:@"App Name"];
+        
+        [mailComposer setMessageBody:shareString isHTML:NO];
+        
+        [self presentViewController:mailComposer animated:YES completion:nil];
+        
+    }
+    
+}
+
+-(void) mailComposeController:(MFMailComposeViewController *)controller didFinishWithResult:(MFMailComposeResult)result error:(NSError *)error
+{
+    
+    [self dismissViewControllerAnimated:YES completion:nil];
+    
+}
+
+-(void) rateThisApp
+{
+    
+    NSString *str = @"itms-apps://ax.itunes.apple.com/WebObjects/MZStore.woa/wa/viewContentsUserReviews?type=Purple+Software&id=yourAppIDHere";
+    if ([[[UIDevice currentDevice] systemVersion] floatValue] >= 7.0 && [[[UIDevice currentDevice] systemVersion] floatValue] < 7.1) {
+        str = @"itms-apps://itunes.apple.com/app/com.rickybrown.Popped";
+    }
+    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:str]];
+    
+}
+
 
 @end
 

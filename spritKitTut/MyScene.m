@@ -11,6 +11,9 @@
 #import "BMGlyphFont.h"
 #import "BMGlyphLabel.h"
 #import "ViewController.h"
+#import "Twitter/Twitter.h"
+
+int shareScore;
 
 static const uint32_t wallCategory       =  0x1 << 2;
 static const uint32_t rockCategory       =  0x1 << 1;
@@ -27,7 +30,7 @@ static const uint32_t playerCategory     =  0x1 << 0;
         self.backgroundColor = [SKColor whiteColor];
         
         /* Collision */
-        CGRect frame = CGRectMake(0, -20, self.size.width+30, self.size.height+100);
+        CGRect frame = CGRectMake(0, -20, self.size.width+30, self.size.height+70);
         self.physicsBody = [SKPhysicsBody bodyWithEdgeLoopFromRect:frame];
         self.physicsBody.categoryBitMask = wallCategory;
         self.physicsWorld.contactDelegate = self;
@@ -42,11 +45,9 @@ static const uint32_t playerCategory     =  0x1 << 0;
         almostDoneFuel = maxFuel/2/2;
         done = YES;
         gameOver = YES;
-        unlockedTwo = NO;
         hit = NO;
         NSInteger theHighScore = [[NSUserDefaults standardUserDefaults] integerForKey:@"HighScore"];
         highscore = theHighScore;
-
         
         /* Move Background */
         for (int i=0; i<2; i++)
@@ -97,8 +98,17 @@ static const uint32_t playerCategory     =  0x1 << 0;
     rockSprite.physicsBody.usesPreciseCollisionDetection = YES;
     
     int randomSpeed = (arc4random()%(5-2))+2;
-    float waitTime = 0.85;
-    int randomPosition = (arc4random()%(320-0)) + 0;
+    float waitTime = 0.7;
+    int randomPosition;
+    
+    if (player.position.y > 15 && player.position.y < 18)
+    {
+        randomPosition = 18;
+    }
+    else
+    {
+        randomPosition = (arc4random()%(325)) + 0;
+    }
     
     [self sendInRockAtSpeed:randomSpeed waitTime:waitTime atY:randomPosition];
     
@@ -107,11 +117,13 @@ static const uint32_t playerCategory     =  0x1 << 0;
 -(void) sendInRockAtSpeed:(int)speed waitTime:(float)wait atY:(int)y {
     
     SKAction *moveObstacle = [SKAction moveToX:moveToX duration:speed];
-    rockSprite = [SKSpriteNode spriteNodeWithImageNamed:@"RockSprite"];
     
+    rockSprite = [SKSpriteNode spriteNodeWithImageNamed:@"RockSprite"];
     rockSprite.size = CGSizeMake(40*3/2-5, 25*3/2-5);
     rockSprite.position = CGPointMake(568, y);
+
     [self addChild:rockSprite];
+    
     [rockSprite runAction:moveObstacle withKey:@"moveing"];
     
     [rockSprite runAction:moveObstacle completion:^(void){
@@ -134,7 +146,16 @@ static const uint32_t playerCategory     =  0x1 << 0;
 
 -(void) touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
     
-    if (!playing && done)
+    UITouch *touch = [touches anyObject];
+    CGPoint location = [touch locationInNode:self];
+    SKNode *node = [self nodeAtPoint:location];
+    
+    if ([node.name isEqualToString:@"share"])
+    {
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"shareIt" object:nil];
+    }
+    
+    else if (!playing && done)
     {
         
         [[NSNotificationCenter defaultCenter] postNotificationName:@"hideAd" object:nil];
@@ -146,7 +167,6 @@ static const uint32_t playerCategory     =  0x1 << 0;
         playing = YES;
         gameOver = NO;
         hit = NO;
-        unlockedTwo = NO;
         player.physicsBody.affectedByGravity = YES;
         player.physicsBody.dynamic = YES;
         
@@ -158,6 +178,7 @@ static const uint32_t playerCategory     =  0x1 << 0;
         [tapToPlayFirstLabel removeFromParent];
         [player removeAllActions];
         [newHighScore removeFromParent];
+        [shareSprite removeFromParent];
         
         SKAction *blinkSequence = [SKAction sequence:@[[SKAction fadeAlphaTo:1.0 duration:0],[SKAction fadeAlphaTo:0.0 duration:0],[SKAction fadeAlphaTo:1.0 duration:0]]];
         
@@ -193,9 +214,13 @@ static const uint32_t playerCategory     =  0x1 << 0;
 
 -(void) gameOver {
 
+    shareScore = (int)score;
+    
     [[NSNotificationCenter defaultCenter] postNotificationName:@"showAd" object:nil];
     
     YourScoreWasLabel.text = [NSString stringWithFormat:@"SCORE: %li", (long)score];
+    
+    NSLog(@"score = %li", (long)score);
     
     NSInteger theHighScore = [[NSUserDefaults standardUserDefaults] integerForKey:@"HighScore"];
     highscore = theHighScore;
@@ -218,6 +243,7 @@ static const uint32_t playerCategory     =  0x1 << 0;
     [self addChild:GameOverLabel];
     [self addChild:YourScoreWasLabel];
     [self addChild:YourHighScoreWasLabel];
+    [self addChild:[self shareScoreButton]];
     
     gameOver = NO;
     playing = NO;
@@ -263,22 +289,29 @@ static const uint32_t playerCategory     =  0x1 << 0;
 
 -(void) didBeginContact:(SKPhysicsContact *)contact {
     
-    SKPhysicsBody *firstBody, *secondBody;
+    SKPhysicsBody *firstBody, *secondBody, *thirdBody;
     
     if (contact.bodyA.categoryBitMask < contact.bodyB.categoryBitMask)
     {
         firstBody = contact.bodyA;
         secondBody = contact.bodyB;
+        thirdBody = contact.bodyB;
     }
     else
     {
         firstBody = contact.bodyB;
         secondBody = contact.bodyA;
+        thirdBody = contact.bodyA;
     }
     
     if ((firstBody.categoryBitMask & playerCategory) != 0 && (secondBody.categoryBitMask & rockCategory) != 0)
     {
         [self collision1:(SKSpriteNode *) firstBody.node didCollideWithRock:(SKSpriteNode *) secondBody.node];
+    }
+    
+    if ((firstBody.categoryBitMask & playerCategory) != 0 && (thirdBody.categoryBitMask & wallCategory) != 0)
+    {
+        [self collision2:(SKSpriteNode *) firstBody.node didCollideWithRock:(SKSpriteNode *) thirdBody.node];
     }
     
 }
@@ -333,11 +366,30 @@ static const uint32_t playerCategory     =  0x1 << 0;
     
 }
 
+#pragma mark Collision between player and wall
+
+-(void) collision2:(SKSpriteNode *)playerS didCollideWithRock:(SKSpriteNode *)wallS {
+    
+    
+}
+
 #pragma mark Collision between player and rock
 
 -(void) collision1:(SKSpriteNode *)playerS didCollideWithRock:(SKSpriteNode *)rockS {
     
     [self anyCollision];
+    
+}
+
+#pragma mark Make button
+
+-(SKSpriteNode *) shareScoreButton
+{
+    
+    shareSprite = [SKSpriteNode spriteNodeWithImageNamed:@"shareButton"];
+    shareSprite.position = CGPointMake(self.size.width/2+230, self.size.height/2-135);
+    shareSprite.name = @"share";
+    return shareSprite;
     
 }
 
@@ -399,21 +451,18 @@ static const uint32_t playerCategory     =  0x1 << 0;
     lifeONE = [SKSpriteNode spriteNodeWithImageNamed:@"heartLifeSprite"];
     lifeONE.position = CGPointMake(self.size.width/2-x, self.size.height/2+y);
     lifeONE.size = CGSizeMake(lifeONE.size.width-s, lifeONE.size.height-s);
-    lifeONE.name = @"lifeONE";
     lifeONE.alpha = 0;
     [self addChild:lifeONE];
     
     lifeTWO = [SKSpriteNode spriteNodeWithImageNamed:@"heartLifeSprite"];
     lifeTWO.size = CGSizeMake(lifeTWO.size.width-s, lifeTWO.size.height-s);
     lifeTWO.position = CGPointMake(self.size.width/2-x+40, self.size.height/2+y);
-    lifeTWO.name = @"lifeFour";
     lifeTWO.alpha = 0;
     [self addChild:lifeTWO];
     
     lifeTHREE = [SKSpriteNode spriteNodeWithImageNamed:@"heartLifeSprite"];
     lifeTHREE.size = CGSizeMake(lifeTHREE.size.width-s, lifeTHREE.size.height-s);
     lifeTHREE.position = CGPointMake(self.size.width/2-x+80, self.size.height/2+y);
-    lifeTHREE.name = @"lifeTHREE";
     lifeTHREE.alpha = 0;
     [self addChild:lifeTHREE];
     

@@ -10,10 +10,12 @@
 
 #import <SpriteKit/SpriteKit.h>
 #import <iAd/iAd.h>
+#import <MessageUI/MessageUI.h>
 
-@interface ViewController : UIViewController <ADBannerViewDelegate> {
+@interface ViewController : UIViewController <ADBannerViewDelegate, UIAlertViewDelegate, MFMailComposeViewControllerDelegate, MFMessageComposeViewControllerDelegate> {
     
     IBOutlet ADBannerView *iAd;
+    NSString *shareString;
     
 }
 
