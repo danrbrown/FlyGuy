@@ -125,7 +125,7 @@
     [UIView beginAnimations:nil context:nil];
     [UIView setAnimationDuration:0.2];
     
-    iAd.frame = CGRectMake(124, 324, iAd.frame.size.width, iAd.frame.size.height);
+    iAd.frame = CGRectMake(571, 270, iAd.frame.size.width, iAd.frame.size.height);
     
     [UIView commitAnimations];
     
