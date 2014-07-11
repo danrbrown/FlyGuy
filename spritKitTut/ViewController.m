@@ -44,9 +44,6 @@
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleNotification:) name:@"shareIt" object:nil];
     
-    shareString = [NSString stringWithFormat:@"I just got %i on [app name]! Beat that!", shareScore];
-    
-    
 }
 
 -(BOOL) shouldAutorotate
@@ -162,6 +159,8 @@
 -(void) postScore
 {
     
+    NSString *shareString = [NSString stringWithFormat:@"I just got %i on [app name]! Beat that!", shareScore];
+    
     SLComposeViewController *post = [[SLComposeViewController alloc] init];
     
     post = [SLComposeViewController composeViewControllerForServiceType:SLServiceTypeFacebook];
@@ -175,6 +174,8 @@
 -(void) tweetScore
 {
     
+    NSString *shareString = [NSString stringWithFormat:@"I just got %i on [app name]! Beat that!", shareScore];
+    
     SLComposeViewController *tweet = [[SLComposeViewController alloc] init];
     
     tweet= [SLComposeViewController composeViewControllerForServiceType:SLServiceTypeTwitter];
@@ -187,6 +188,8 @@
 
 -(void) sendTheText
 {
+    
+    NSString *shareString = [NSString stringWithFormat:@"I just got %i on [app name]! Beat that!", shareScore];
     
     MFMessageComposeViewController *textMessage = [[MFMessageComposeViewController alloc] init];
     
@@ -212,6 +215,8 @@
 
 -(void) sendTheEmail
 {
+    
+    NSString *shareString = [NSString stringWithFormat:@"I just got %i on [app name]! Beat that!", shareScore];
     
     MFMailComposeViewController *mailComposer = [[MFMailComposeViewController alloc] init];
     

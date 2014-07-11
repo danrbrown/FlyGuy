@@ -15,7 +15,6 @@
 @interface ViewController : UIViewController <ADBannerViewDelegate, UIAlertViewDelegate, MFMailComposeViewControllerDelegate, MFMessageComposeViewControllerDelegate> {
     
     IBOutlet ADBannerView *iAd;
-    NSString *shareString;
     
 }
 
