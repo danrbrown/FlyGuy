@@ -80,7 +80,7 @@
     else if ([notification.name isEqualToString:@"shareIt"])
     {
         
-        UIAlertView *popUp = [[UIAlertView alloc] initWithTitle:@"Share via..." message:nil delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Facebook", @"Twitter", @"iMessage", @"Email", @"Rate this app", nil];
+        UIAlertView *popUp = [[UIAlertView alloc] initWithTitle:@"Share via..." message:nil delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Facebook", @"Twitter", @"iMessage", @"Email", nil];
         
         [popUp show];
         
@@ -143,10 +143,6 @@
     else if (buttonIndex == 4)
     {
         [self sendTheEmail];
-    }
-    else if (buttonIndex == 5)
-    {
-        [self rateThisApp];
     }
     
 }
@@ -236,18 +232,6 @@
     [self dismissViewControllerAnimated:YES completion:nil];
     
 }
-
--(void) rateThisApp
-{
-    
-    NSString *str = @"itms-apps://ax.itunes.apple.com/WebObjects/MZStore.woa/wa/viewContentsUserReviews?type=Purple+Software&id=yourAppIDHere";
-    if ([[[UIDevice currentDevice] systemVersion] floatValue] >= 7.0 && [[[UIDevice currentDevice] systemVersion] floatValue] < 7.1) {
-        str = @"itms-apps://itunes.apple.com/app/com.rickybrown.Popped";
-    }
-    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:str]];
-    
-}
-
 
 @end
 

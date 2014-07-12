@@ -323,6 +323,9 @@
 				LastUpgradeCheck = 0510;
 				ORGANIZATIONNAME = 15and50;
 				TargetAttributes = {
+					9C1B772B193CF67A00977B60 = {
+						DevelopmentTeam = 69QHNGD4FM;
+					};
 					9C1B7753193CF67A00977B60 = {
 						TestTargetID = 9C1B772B193CF67A00977B60;
 					};
@@ -526,6 +529,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "spritKitTut/spritKitTut-Prefix.pch";
 				INFOPLIST_FILE = "spritKitTut/spritKitTut-Info.plist";
@@ -541,6 +545,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "spritKitTut/spritKitTut-Prefix.pch";
 				INFOPLIST_FILE = "spritKitTut/spritKitTut-Info.plist";
